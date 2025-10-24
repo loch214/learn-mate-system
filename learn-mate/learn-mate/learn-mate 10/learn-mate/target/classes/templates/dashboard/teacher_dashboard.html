@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layout :: layout(~{::content}, 'Teacher Dashboard')}">
+<div th:fragment="content">
+    <div class="surface-card">
+        <div class="section-header">
+            <div>
+                <h2 class="page-title"><span class="icon">👩‍🏫</span>Teacher Dashboard</h2>
+                <p>Manage your classes, assessments, and student progress in one place.</p>
+            </div>
+            <a th:href="@{/timetables/weekly}" class="btn btn-secondary">Weekly Timetable</a>
+        </div>
+    </div>
+
+    <div class="tile-grid cols-3">
+        <div class="tile-card">
+            <header>
+                <div>
+                    <h3>My Classes</h3>
+                    <p>Review your assigned classes and students.</p>
+                </div>
+                <div class="tile-icon">🏫</div>
+            </header>
+            <a th:href="@{/classes/list}" class="btn btn-primary">View Classes</a>
+        </div>
+
+        <div class="tile-card">
+            <header>
+                <div>
+                    <h3>Mark Attendance</h3>
+                    <p>Record attendance for your current sessions.</p>
+                </div>
+                <div class="tile-icon">📝</div>
+            </header>
+            <a th:href="@{/attendances/mark}" class="btn btn-success">Mark Attendance</a>
+        </div>
+
+        <div class="tile-card">
+            <header>
+                <div>
+                    <h3>Manage Exams</h3>
+                    <p>Schedule upcoming exams and share details.</p>
+                </div>
+                <div class="tile-icon">🧪</div>
+            </header>
+            <a th:href="@{/exams/list}" class="btn btn-primary">Manage Exams</a>
+        </div>
+
+        <div class="tile-card">
+            <header>
+                <div>
+                    <h3>Enter Marks</h3>
+                    <p>Capture and update student marks quickly.</p>
+                </div>
+                <div class="tile-icon">📈</div>
+            </header>
+            <a th:href="@{/marks/bulk}" class="btn btn-secondary">Enter Marks</a>
+        </div>
+
+        <div class="tile-card">
+            <header>
+                <div>
+                    <h3>Learning Materials</h3>
+                    <p>Upload or revise class resources.</p>
+                </div>
+                <div class="tile-icon">📂</div>
+            </header>
+            <a th:href="@{/materials/list}" class="btn btn-primary">Manage Materials</a>
+        </div>
+
+        <div class="tile-card">
+            <header>
+                <div>
+                    <h3>My Profile</h3>
+                    <p>Keep your contact details up to date.</p>
+                </div>
+                <div class="tile-icon">🧑‍💼</div>
+            </header>
+            <a th:href="@{/users/profile}" class="btn btn-secondary">Edit Profile</a>
+        </div>
+    </div>
+
+    <div class="surface-card">
+        <h3 class="text-xl font-semibold" style="margin-bottom: 1.5rem;">Teaching Overview</h3>
+        <div class="grid-responsive three-columns">
+            <div class="stat-card">
+                <h3>My Classes</h3>
+                <p th:text="${totalClasses ?: 0}">0</p>
+            </div>
+            <div class="stat-card accent-green">
+                <h3>Total Students</h3>
+                <p th:text="${totalStudents ?: 0}">0</p>
+            </div>
+            <div class="stat-card accent-purple">
+                <h3>Pending Exams</h3>
+                <p th:text="${pendingExams ?: 0}">0</p>
+            </div>
+            <div class="stat-card" style="background: linear-gradient(135deg, rgba(250, 204, 21, 0.15), rgba(251, 191, 36, 0.18)); border-color: rgba(217, 119, 6, 0.2);">
+                <h3>Ungraded Papers</h3>
+                <p th:text="${ungradedPapers ?: 0}">0</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="surface-card compact">
+        <h3 class="text-xl font-semibold" style="margin-bottom: 1.25rem;">Recent Activity</h3>
+        <div class="timeline">
+            <div class="timeline-item">
+                <h4>Attendance updated</h4>
+                <p>Marked attendance for your latest session.</p>
+            </div>
+            <div class="timeline-item">
+                <h4>Exam scheduled</h4>
+                <p>Created a new assessment for your Algebra class.</p>
+            </div>
+            <div class="timeline-item">
+                <h4>Marks submitted</h4>
+                <p>Recorded marks for 25 students this week.</p>
+            </div>
+        </div>
+    </div>
+</div>
+</html>

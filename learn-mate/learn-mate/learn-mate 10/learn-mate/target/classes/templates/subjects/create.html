@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+      th:replace="~{layout :: layout(~{::content}, 'Create Subject')}">
+    <div th:fragment="content">
+        <h2 class="text-xl font-bold mb-4 text-blue-600">Create Subject</h2>
+        <form th:action="@{/subjects/create}" th:object="${subject}" method="post">
+            <div class="mb-4">
+                <label for="name" class="block">Name</label>
+                <input type="text" th:field="*{name}" id="name" class="w-full border p-2 rounded">
+                <p th:if="#{fields.hasErrors('name')}" th:errors="*{name}" class="text-red-500"></p>
+            </div>
+            <button type="submit" class="bg-green-500 text-white py-2 px-4 rounded hover:bg-green-600 transition">Save</button>
+        </form>
+    </div>
+</html>

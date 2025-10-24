@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Teacher Dashboard - Learn Mate</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdn.jsdelivr.net/npm/heroicons@2.0.18/outline.css" rel="stylesheet">
+</head>
+<body class="bg-gray-100 font-sans">
+    <header class="bg-green-600 text-white p-4 flex justify-between items-center shadow-lg">
+        <h1 class="text-2xl font-bold">Learn Mate - Teacher Portal</h1>
+        <div class="flex items-center space-x-4">
+            <span class="text-sm">Welcome, <span th:text="${#authentication.name}">Teacher</span></span>
+            <a th:href="@{/logout}" class="bg-red-500 hover:bg-red-600 px-4 py-2 rounded transition">Logout</a>
+        </div>
+    </header>
+
+    <div class="flex">
+        <div th:replace="~{fragments/sidebar :: modern-sidebar('dashboard')}"></div>
+        <main class="flex-1 p-6">
+        <div class="bg-white rounded-lg shadow-lg p-6 mb-6">
+            <h2 class="text-3xl font-bold text-gray-800 mb-2">Teacher Dashboard</h2>
+            <p class="text-gray-600 mb-6">Manage your classes, students, and academic activities</p>
+        </div>
+
+        <!-- Teacher Features Grid -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6">
+            
+            <!-- My Classes Card -->
+            <div class="bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300">
+                <div class="p-6">
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="text-xl font-semibold text-gray-800">My Classes</h3>
+                        <div class="bg-blue-100 p-3 rounded-full">
+                            <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0H5m14 0h2m-2 0h-6a2 2 0 01-6 0m2-5h4a2 2 0 004 0V9a2 2 0 00-4 0v7z"></path>
+                            </svg>
+                        </div>
+                    </div>
+                    <p class="text-gray-600 mb-4">View and manage your assigned classes and students</p>
+                    <a th:href="@{/classes/list}" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded transition-colors duration-200 inline-block">
+                        View Classes
+                    </a>
+                </div>
+            </div>
+
+            <!-- Mark Attendance Card -->
+            <div class="bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300">
+                <div class="p-6">
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="text-xl font-semibold text-gray-800">Mark Attendance</h3>
+                        <div class="bg-green-100 p-3 rounded-full">
+                            <svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                            </svg>
+                        </div>
+                    </div>
+                    <p class="text-gray-600 mb-4">Record student attendance for your classes</p>
+                    <a th:href="@{/attendances/mark}" class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded transition-colors duration-200 inline-block">
+                        Mark Attendance
+                    </a>
+                </div>
+            </div>
+
+            <!-- Manage Exams Card -->
+            <div class="bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300">
+                <div class="p-6">
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="text-xl font-semibold text-gray-800">Manage Exams</h3>
+                        <div class="bg-purple-100 p-3 rounded-full">
+                            <svg class="w-6 h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                            </svg>
+                        </div>
+                    </div>
+                    <p class="text-gray-600 mb-4">Create and schedule exams for your subjects</p>
+                    <a th:href="@{/exams/list}" class="bg-purple-500 hover:bg-purple-600 text-white px-4 py-2 rounded transition-colors duration-200 inline-block">
+                        Manage Exams
+                    </a>
+                </div>
+            </div>
+
+            <!-- Enter Marks Card -->
+            <div class="bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300">
+                <div class="p-6">
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="text-xl font-semibold text-gray-800">Enter Marks</h3>
+                        <div class="bg-orange-100 p-3 rounded-full">
+                            <svg class="w-6 h-6 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+                            </svg>
+                        </div>
+                    </div>
+                    <p class="text-gray-600 mb-4">Record and update student exam results</p>
+                    <a th:href="@{/marks/bulk}" class="bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 rounded transition-colors duration-200 inline-block">
+                        Enter Marks
+                    </a>
+                </div>
+            </div>
+
+            <!-- My Timetables Card -->
+            <div class="bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300">
+                <div class="p-6">
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="text-xl font-semibold text-gray-800">My Timetables</h3>
+                        <div class="bg-indigo-100 p-3 rounded-full">
+                            <svg class="w-6 h-6 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                            </svg>
+                        </div>
+                    </div>
+                    <p class="text-gray-600 mb-4">View and manage your class schedules</p>
+                    <a th:href="@{/timetables/weekly}" class="bg-indigo-500 hover:bg-indigo-600 text-white px-4 py-2 rounded transition-colors duration-200 inline-block">
+                        My Timetables
+                    </a>
+                </div>
+            </div>
+
+            <!-- My Profile Card -->
+            <div class="bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300">
+                <div class="p-6">
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="text-xl font-semibold text-gray-800">My Profile</h3>
+                        <div class="bg-blue-100 p-3 rounded-full">
+                            <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
+                            </svg>
+                        </div>
+                    </div>
+                    <p class="text-gray-600 mb-4">View and update your personal information</p>
+                    <a th:href="@{/users/profile}" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded transition-colors duration-200 inline-block">
+                        My Profile
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Teacher Quick Stats Section -->
+        <div class="bg-white rounded-lg shadow-lg p-6 mt-6">
+            <h3 class="text-2xl font-bold text-gray-800 mb-4">Teaching Overview</h3>
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                <div class="bg-blue-50 p-4 rounded-lg">
+                    <h4 class="font-semibold text-blue-800">My Classes</h4>
+                    <p class="text-2xl font-bold text-blue-600" th:text="${totalClasses ?: 0}">0</p>
+                </div>
+                <div class="bg-green-50 p-4 rounded-lg">
+                    <h4 class="font-semibold text-green-800">Total Students</h4>
+                    <p class="text-2xl font-bold text-green-600" th:text="${totalStudents ?: 0}">0</p>
+                </div>
+                <div class="bg-purple-50 p-4 rounded-lg">
+                    <h4 class="font-semibold text-purple-800">Pending Exams</h4>
+                    <p class="text-2xl font-bold text-purple-600" th:text="${pendingExams ?: 0}">0</p>
+                </div>
+                <div class="bg-orange-50 p-4 rounded-lg">
+                    <h4 class="font-semibold text-orange-800">Ungraded Papers</h4>
+                    <p class="text-2xl font-bold text-orange-600" th:text="${ungradedPapers ?: 0}">0</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Recent Activity -->
+        <div class="bg-white rounded-lg shadow-lg p-6 mt-6">
+            <h3 class="text-2xl font-bold text-gray-800 mb-4">Recent Activity</h3>
+            <div class="space-y-3">
+                <div class="flex items-center p-3 bg-gray-50 rounded-lg">
+                    <div class="w-2 h-2 bg-green-500 rounded-full mr-3"></div>
+                    <span class="text-gray-700">Attendance marked for Class 10A - Mathematics</span>
+                    <span class="text-gray-500 text-sm ml-auto">2 hours ago</span>
+                </div>
+                <div class="flex items-center p-3 bg-gray-50 rounded-lg">
+                    <div class="w-2 h-2 bg-purple-500 rounded-full mr-3"></div>
+                    <span class="text-gray-700">New exam created: Algebra Mid-term</span>
+                    <span class="text-gray-500 text-sm ml-auto">1 day ago</span>
+                </div>
+                <div class="flex items-center p-3 bg-gray-50 rounded-lg">
+                    <div class="w-2 h-2 bg-orange-500 rounded-full mr-3"></div>
+                    <span class="text-gray-700">Marks entered for 25 students</span>
+                    <span class="text-gray-500 text-sm ml-auto">3 days ago</span>
+                </div>
+            </div>
+        </div>
+        </main>
+    </div>
+
+    <footer class="bg-green-600 text-white p-4 text-center mt-8">
+        &copy; 2025 Learn Mate. All rights reserved.
+    </footer>
+</body>
+</html>

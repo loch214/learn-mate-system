@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fee Management Test - Learn Mate</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100">
+    <div class="min-h-screen p-8">
+        <div class="max-w-4xl mx-auto">
+            <h1 class="text-3xl font-bold text-blue-600 mb-8">Fee Management Test Page</h1>
+            
+            <!-- Test Instructions -->
+            <div class="bg-blue-50 border border-blue-200 rounded-lg p-6 mb-8">
+                <h2 class="text-xl font-semibold text-blue-800 mb-4">Test Instructions</h2>
+                <ol class="list-decimal list-inside space-y-2 text-blue-700">
+                    <li>Start the Spring Boot application: <code class="bg-blue-100 px-2 py-1 rounded">mvn spring-boot:run</code></li>
+                    <li>Login as admin: <code class="bg-blue-100 px-2 py-1 rounded">admin / Admin@12345</code></li>
+                    <li>Go to Fees → "Create Subject Fee" to create fees for subjects</li>
+                    <li>Login as student: <code class="bg-blue-100 px-2 py-1 rounded">student1 / password123</code></li>
+                    <li>Go to Profile to see fee information and payment buttons</li>
+                </ol>
+            </div>
+
+            <!-- Sample Student Profile with Fee Information -->
+            <div class="bg-white rounded-lg shadow-md p-6">
+                <h2 class="text-2xl font-bold mb-6 text-blue-600">Sample Student Profile with Fee Information</h2>
+                
+                <!-- Student Info -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                    <div class="md:col-span-1">
+                        <div class="bg-gray-50 p-6 rounded-lg text-center">
+                            <div class="w-32 h-32 bg-blue-500 rounded-full mx-auto mb-4 flex items-center justify-center">
+                                <svg class="w-16 h-16 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
+                                </svg>
+                            </div>
+                            <h3 class="text-lg font-semibold text-gray-900 mb-2">student1</h3>
+                            <span class="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm font-semibold">STUDENT</span>
+                        </div>
+                    </div>
+
+                    <div class="md:col-span-2">
+                        <div class="space-y-6">
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Full Name</label>
+                                    <div class="bg-gray-50 p-3 rounded-md border">student1</div>
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Username</label>
+                                    <div class="bg-gray-50 p-3 rounded-md border">student1</div>
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Email Address</label>
+                                    <div class="bg-gray-50 p-3 rounded-md border">student1@gmail.com</div>
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Contact Number</label>
+                                    <div class="bg-gray-50 p-3 rounded-md border">Not provided</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Enrolled Subjects with Fee Information -->
+                <div class="mt-8">
+                    <h3 class="text-xl font-semibold text-gray-900 mb-4">Enrolled Subjects with Fee Information</h3>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                        
+                        <!-- Mathematics Subject Card -->
+                        <div class="p-4 border rounded-lg bg-white shadow-sm">
+                            <div class="flex items-start justify-between">
+                                <div class="flex items-center">
+                                    <div class="w-8 h-8 flex items-center justify-center rounded-full bg-blue-100 text-blue-700 mr-3 font-semibold">S</div>
+                                    <div>
+                                        <div class="text-sm font-medium text-gray-900">Mathematics</div>
+                                        <div class="text-xs text-gray-500">Enrolled</div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Fee Information -->
+                            <div class="mt-3 pt-3 border-t border-gray-100">
+                                <div class="space-y-2">
+                                    <div class="flex justify-between items-center">
+                                        <span class="text-sm text-gray-600">Fee Amount:</span>
+                                        <span class="text-sm font-medium text-gray-900">$150.00</span>
+                                    </div>
+                                    <div class="flex justify-between items-center">
+                                        <span class="text-sm text-gray-600">Status:</span>
+                                        <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
+                                            <svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clip-rule="evenodd"></path>
+                                            </svg>
+                                            Pending
+                                        </span>
+                                    </div>
+                                    <div class="flex justify-between items-center">
+                                        <span class="text-sm text-gray-600">Due Date:</span>
+                                        <span class="text-sm text-gray-900">Dec 09, 2024</span>
+                                    </div>
+                                    
+                                    <!-- Payment Button -->
+                                    <div class="mt-3">
+                                        <button class="w-full bg-green-500 text-white py-2 px-4 rounded-md hover:bg-green-600 transition text-sm font-medium inline-flex items-center justify-center">
+                                            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1"></path>
+                                            </svg>
+                                            Pay Now
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- English Subject Card -->
+                        <div class="p-4 border rounded-lg bg-white shadow-sm">
+                            <div class="flex items-start justify-between">
+                                <div class="flex items-center">
+                                    <div class="w-8 h-8 flex items-center justify-center rounded-full bg-blue-100 text-blue-700 mr-3 font-semibold">S</div>
+                                    <div>
+                                        <div class="text-sm font-medium text-gray-900">English</div>
+                                        <div class="text-xs text-gray-500">Enrolled</div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Fee Information -->
+                            <div class="mt-3 pt-3 border-t border-gray-100">
+                                <div class="space-y-2">
+                                    <div class="flex justify-between items-center">
+                                        <span class="text-sm text-gray-600">Fee Amount:</span>
+                                        <span class="text-sm font-medium text-gray-900">$120.00</span>
+                                    </div>
+                                    <div class="flex justify-between items-center">
+                                        <span class="text-sm text-gray-600">Status:</span>
+                                        <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                                            <svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                                                <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
+                                            </svg>
+                                            Paid
+                                        </span>
+                                    </div>
+                                    <div class="flex justify-between items-center">
+                                        <span class="text-sm text-gray-600">Paid On:</span>
+                                        <span class="text-sm text-gray-900">Nov 15, 2024</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Science Subject Card -->
+                        <div class="p-4 border rounded-lg bg-white shadow-sm">
+                            <div class="flex items-start justify-between">
+                                <div class="flex items-center">
+                                    <div class="w-8 h-8 flex items-center justify-center rounded-full bg-blue-100 text-blue-700 mr-3 font-semibold">S</div>
+                                    <div>
+                                        <div class="text-sm font-medium text-gray-900">Science</div>
+                                        <div class="text-xs text-gray-500">Enrolled</div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Fee Information -->
+                            <div class="mt-3 pt-3 border-t border-gray-100">
+                                <div class="space-y-2">
+                                    <div class="flex justify-between items-center">
+                                        <span class="text-sm text-gray-600">Fee Amount:</span>
+                                        <span class="text-sm font-medium text-gray-900">$180.00</span>
+                                    </div>
+                                    <div class="flex justify-between items-center">
+                                        <span class="text-sm text-gray-600">Status:</span>
+                                        <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-red-100 text-red-800">
+                                            <svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                                                <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"></path>
+                                            </svg>
+                                            Overdue
+                                        </span>
+                                    </div>
+                                    <div class="flex justify-between items-center">
+                                        <span class="text-sm text-gray-600">Due Date:</span>
+                                        <span class="text-sm text-gray-900">Nov 01, 2024</span>
+                                    </div>
+                                    
+                                    <!-- Payment Button -->
+                                    <div class="mt-3">
+                                        <button class="w-full bg-green-500 text-white py-2 px-4 rounded-md hover:bg-green-600 transition text-sm font-medium inline-flex items-center justify-center">
+                                            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1"></path>
+                                            </svg>
+                                            Pay Now
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Features Summary -->
+                <div class="mt-8 p-4 bg-green-50 rounded-lg border border-green-200">
+                    <h4 class="font-semibold text-green-800 mb-2">✅ Fee Management Features Implemented</h4>
+                    <div class="text-sm text-green-700 space-y-1">
+                        <p>• <strong>Fee Display:</strong> Each subject shows fee amount, status, and due date</p>
+                        <p>• <strong>Status Indicators:</strong> Color-coded badges (Paid/Pending/Overdue)</p>
+                        <p>• <strong>Payment Buttons:</strong> "Pay Now" button for pending/overdue fees</p>
+                        <p>• <strong>Admin Interface:</strong> Create fees for all students in a subject</p>
+                        <p>• <strong>Database Integration:</strong> Proper relationships between students, subjects, and fees</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+      th:replace="~{layout :: layout(~{::content}, 'Create Mark')}">
+    <div th:fragment="content">
+        <h2 class="text-xl font-bold mb-4 text-blue-600">Enter Mark</h2>
+        <form th:action="@{/marks/create}" th:object="${mark}" method="post">
+            <div class="mb-4">
+                <label for="exam" class="block">Exam</label>
+                <select th:field="*{exam.id}" id="exam" class="w-full border p-2 rounded">
+                    <option value="" disabled th:selected="${mark.exam == null || mark.exam.id == null}">Select an exam</option>
+                    <option th:each="e : ${exams}" th:value="${e.id}" th:text="${e.subject.name} - ${e.date}"></option>
+                </select>
+            </div>
+            <div class="mb-4">
+                <label for="student" class="block">Student</label>
+                <select th:field="*{student.id}" id="student" class="w-full border p-2 rounded">
+                    <option value="" disabled th:selected="${mark.student == null || mark.student.id == null}">Select a student</option>
+                    <option th:each="s : ${students}" th:value="${s.id}" th:text="${s.name}"></option>
+                </select>
+            </div>
+            <div class="mb-4">
+                <label for="score" class="block">Score</label>
+                <input type="number" th:field="*{score}" id="score" class="w-full border p-2 rounded">
+                <p th:if="#{fields.hasErrors('score')}" th:errors="*{score}" class="text-red-500"></p>
+            </div>
+            <div class="mb-4">
+                <label for="published" class="block">Published</label>
+                <input type="checkbox" th:field="*{published}" id="published">
+            </div>
+            <button type="submit" class="bg-green-500 text-white py-2 px-4 rounded hover:bg-green-600 transition">Save</button>
+        </form>
+    </div>
+</html>

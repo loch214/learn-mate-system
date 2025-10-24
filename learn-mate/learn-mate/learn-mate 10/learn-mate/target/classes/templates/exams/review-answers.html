@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <title>Review Answer Sheets - Learn Mate</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link th:href="@{/css/main.css}" rel="stylesheet">
+</head>
+<body class="bg-gray-100 font-sans">
+    <div class="flex">
+        <div th:replace="~{fragments/sidebar :: modern-sidebar('exams')}"></div>
+        
+        <main class="flex-1 p-6">
+        <h1 class="text-3xl font-bold mb-6">Review Answer Sheets</h1>
+        
+        <!-- Error Messages -->
+        <div th:if="${error}" class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
+            <span th:text="${error}"></span>
+        </div>
+        
+        <!-- Success Messages -->
+        <div th:if="${success}" class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-4">
+            <span th:text="${success}"></span>
+        </div>
+        
+        <!-- Exam Details -->
+        <div class="bg-white p-6 rounded-lg shadow-md mb-6">
+            <h2 class="text-xl font-semibold mb-4">Exam Details</h2>
+            <div class="grid grid-cols-2 gap-4">
+                <div>
+                    <strong>Subject:</strong> 
+                    <span th:text="${exam.subject != null ? exam.subject.name : 'N/A'}"></span>
+                </div>
+                <div>
+                    <strong>Class:</strong> 
+                    <span th:text="${exam.schoolClass != null ? exam.schoolClass.name : 'N/A'}"></span>
+                </div>
+                <div>
+                    <strong>Date:</strong> 
+                    <span th:text="${exam.date != null ? #temporals.format(exam.date, 'dd MMM yyyy') : 'N/A'}"></span>
+                </div>
+                <div>
+                    <strong>Max Marks:</strong> 
+                    <span th:text="${exam.maxMarks != null ? exam.maxMarks : 'N/A'}"></span>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Students List -->
+        <div class="bg-white p-6 rounded-lg shadow-md">
+            <h2 class="text-xl font-semibold mb-4">Students</h2>
+            
+            <form th:action="@{/exams/grade-exam/{id}(id=${exam.id})}" method="post">
+                <table class="w-full border-collapse">
+                    <thead>
+                        <tr class="bg-gray-50">
+                            <th class="border p-2 text-left">Student Name</th>
+                            <th class="border p-2 text-left">Answer Sheet</th>
+                            <th class="border p-2 text-left">Status</th>
+                            <th class="border p-2 text-left">Score</th>
+                            <th class="border p-2 text-left">Comments</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="student : ${students}" class="border-b">
+                            <td class="border p-2">
+                                <div th:text="${student.name}">Student Name</div>
+                                <div class="text-sm text-gray-500" th:text="${student.username}">username</div>
+                            </td>
+                            <td class="border p-2">
+                                <div th:each="answerSheet : ${answerSheets}" th:if="${answerSheet.student.id == student.id}">
+                                    <a th:if="${answerSheet.filePath != null}" 
+                                       th:href="@{/exams/download-answer/{id}(id=${answerSheet.id})}" 
+                                       th:download="'answer_' + ${answerSheet.id} + '_' + ${answerSheet.student.name} + '.pdf'"
+                                       class="bg-green-500 text-white px-3 py-1 rounded text-sm hover:bg-green-600 inline-block">
+                                        Download Answer
+                                    </a>
+                                    <span th:if="${answerSheet.filePath == null}" class="text-gray-500 text-sm italic">No file uploaded</span>
+                                </div>
+                                <span th:if="${!#lists.contains(answerSheets.![student.id], student.id)}" class="text-gray-500 text-sm italic">Not submitted</span>
+                            </td>
+                            <td class="border p-2">
+                                <div th:each="answerSheet : ${answerSheets}" th:if="${answerSheet.student.id == student.id}">
+                                    <span th:if="${answerSheet.status == 'SUBMITTED'}" 
+                                          class="inline-block bg-yellow-100 text-yellow-800 px-2 py-1 rounded text-xs">
+                                        Submitted
+                                    </span>
+                                    <span th:if="${answerSheet.status == 'GRADED'}" 
+                                          class="inline-block bg-green-100 text-green-800 px-2 py-1 rounded text-xs">
+                                        Graded
+                                    </span>
+                                </div>
+                                <span th:if="${!#lists.contains(answerSheets.![student.id], student.id)}" class="text-gray-500 text-sm italic">Not submitted</span>
+                            </td>
+                            <td class="border p-2">
+                                <!-- Check if student has existing mark -->
+                                <div th:if="${existingMarks != null}">
+                                    <div th:each="mark : ${existingMarks}" th:if="${mark.student.id == student.id}">
+                                        <div class="flex items-center space-x-2">
+                                            <span class="font-semibold text-lg" th:text="${mark.score}">0</span>
+                                            <button type="button" 
+                                                    th:onclick="'toggleEdit(' + ${student.id} + ')'"
+                                                    class="bg-blue-500 text-white px-2 py-1 rounded text-xs hover:bg-blue-600">
+                                                Edit
+                                            </button>
+                                        </div>
+                                        <div th:id="'edit-form-' + ${student.id}" class="hidden mt-2">
+                                            <form th:action="@{/exams/edit-mark/{examId}(examId=${exam.id})}" method="post" class="flex items-center space-x-2" onsubmit="console.log('Form action:', this.action, 'Method:', this.method); return true;">
+                                                <input type="hidden" th:name="studentId" th:value="${student.id}">
+                                                <input type="number" 
+                                                       th:name="score" 
+                                                       th:value="${mark.score}"
+                                                       min="0" 
+                                                       th:max="${exam.maxMarks != null ? exam.maxMarks : 100}"
+                                                       class="w-16 border rounded px-2 py-1 text-sm">
+                                                <input type="text" 
+                                                       th:name="comments" 
+                                                       th:value="${mark.comments}"
+                                                       class="w-32 border rounded px-2 py-1 text-sm"
+                                                       placeholder="Comments">
+                                                <button type="submit" onclick="console.log('Form submitted for student:', this.form.studentId.value, 'Score:', this.form.score.value); return true;" class="bg-green-500 text-white px-2 py-1 rounded text-xs hover:bg-green-600">
+                                                    Save
+                                                </button>
+                                                <button type="button" 
+                                                        th:onclick="'toggleEdit(' + ${student.id} + ')'"
+                                                        class="bg-gray-500 text-white px-2 py-1 rounded text-xs hover:bg-gray-600">
+                                                    Cancel
+                                                </button>
+                                            </form>
+                                        </div>
+                                    </div>
+                                    <!-- Show input field if no existing mark -->
+                                    <div th:if="${!#lists.contains(existingMarks.![student.id], student.id)}">
+                                        <input type="number" 
+                                               th:name="'score_' + ${student.id}" 
+                                               min="0" 
+                                               th:max="${exam.maxMarks != null ? exam.maxMarks : 100}"
+                                               class="w-20 border rounded px-2 py-1"
+                                               placeholder="0">
+                                    </div>
+                                </div>
+                                <!-- Fallback if existingMarks is null -->
+                                <div th:if="${existingMarks == null}">
+                                    <input type="number" 
+                                           th:name="'score_' + ${student.id}" 
+                                           min="0" 
+                                           th:max="${exam.maxMarks != null ? exam.maxMarks : 100}"
+                                           class="w-20 border rounded px-2 py-1"
+                                           placeholder="0">
+                                </div>
+                            </td>
+                            <td class="border p-2">
+                                <!-- Check if student has existing mark -->
+                                <div th:if="${existingMarks != null}">
+                                    <div th:each="mark : ${existingMarks}" th:if="${mark.student.id == student.id}">
+                                        <span th:if="${mark.comments != null and !mark.comments.isEmpty()}" 
+                                              class="text-sm text-gray-600" th:text="${mark.comments}">Comments</span>
+                                        <span th:if="${mark.comments == null or mark.comments.isEmpty()}" 
+                                              class="text-gray-400 text-sm italic">No comments</span>
+                                    </div>
+                                    <!-- Show input field if no existing mark -->
+                                    <div th:if="${!#lists.contains(existingMarks.![student.id], student.id)}">
+                                        <input type="text" 
+                                               th:name="'comments_' + ${student.id}" 
+                                               class="w-full border rounded px-2 py-1"
+                                               placeholder="Comments">
+                                    </div>
+                                </div>
+                                <!-- Fallback if existingMarks is null -->
+                                <div th:if="${existingMarks == null}">
+                                    <input type="text" 
+                                           th:name="'comments_' + ${student.id}" 
+                                           class="w-full border rounded px-2 py-1"
+                                           placeholder="Comments">
+                                </div>
+                            </td>
+                        </tr>
+                        <tr th:if="${#lists.isEmpty(students)}">
+                            <td colspan="5" class="border p-4 text-center text-gray-500">
+                                No students found for this exam.
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+                
+                <div class="mt-4">
+                    <button type="submit" class="bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700">
+                        Submit Grades
+                    </button>
+                </div>
+            </form>
+        </div>
+        
+        <!-- Back Button -->
+        <div class="mt-6">
+            <a th:href="@{/exams/list}" class="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600">
+                Back to Exams
+            </a>
+            </div>
+        </main>
+    </div>
+    
+    <script>
+        function toggleEdit(studentId) {
+            const editForm = document.getElementById('edit-form-' + studentId);
+            if (editForm.classList.contains('hidden')) {
+                editForm.classList.remove('hidden');
+            } else {
+                editForm.classList.add('hidden');
+            }
+        }
+    </script>
+</body>
+</html>

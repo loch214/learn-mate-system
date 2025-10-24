@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <title>Edit Attendance</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdn.jsdelivr.net/npm/heroicons@2.0.18/outline.css" rel="stylesheet">
+    <link th:href="@{/css/main.css}" rel="stylesheet">
+</head>
+<body class="bg-gray-100 font-sans">
+    <header class="bg-blue-600 text-white p-4 flex justify-between items-center shadow-md">
+        <h1 class="text-2xl font-bold">Learn Mate</h1>
+        <nav>
+            <a th:href="@{/dashboard}" class="mx-2 hover:underline">Dashboard</a>
+            <a th:href="@{/logout}" class="mx-2 hover:underline">Logout</a>
+        </nav>
+    </header>
+    <div class="flex">
+        <div th:replace="~{fragments/sidebar :: modern-sidebar('attendances')}"></div>
+        <main class="flex-1 p-6">
+            <div class="bg-white p-6 rounded-lg shadow-md">
+                <div class="flex items-center justify-between mb-6">
+                    <div>
+                        <h2 class="text-2xl font-bold text-blue-600">Update Attendance Record</h2>
+                        <p class="text-sm text-gray-500">Adjust the attendance status or notes for this session.</p>
+                    </div>
+                    <a th:href="@{/attendances/list}" class="inline-flex items-center gap-2 rounded-md border border-blue-200 bg-blue-50 px-4 py-2 text-sm font-semibold text-blue-700 hover:bg-blue-100">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
+                        Back to Attendance List
+                    </a>
+                </div>
+
+                <div th:if="${attendance}" class="space-y-6">
+                    <div class="grid gap-4 md:grid-cols-2">
+                        <div class="rounded-lg border border-blue-100 bg-blue-50 p-4">
+                            <h3 class="text-sm font-semibold text-blue-800 uppercase tracking-wide">Student</h3>
+                            <p class="text-lg font-semibold text-blue-900" th:text="${attendance.student != null ? attendance.student.name : 'Unknown Student'}">Student Name</p>
+                            <p class="text-xs text-blue-600" th:text="${attendance.student != null ? attendance.student.email : ''}">student@example.com</p>
+                        </div>
+                        <div class="rounded-lg border border-indigo-100 bg-indigo-50 p-4">
+                            <h3 class="text-sm font-semibold text-indigo-800 uppercase tracking-wide">Session Details</h3>
+                            <p class="text-lg font-semibold text-indigo-900" th:text="${attendance.schoolClass != null ? attendance.schoolClass.name : 'Unassigned Class'}">Class Name</p>
+                            <p class="text-xs text-indigo-600" th:text="${attendance.date != null ? #temporals.format(attendance.date, 'EEEE, dd MMM yyyy') : 'No date recorded'}">Date</p>
+                            <p class="text-xs text-indigo-600 mt-1" th:text="${attendance.subject != null ? 'Subject: ' + attendance.subject.name : 'Subject: General'}">Subject info</p>
+                            <p class="text-xs text-indigo-600" th:text="${attendance.teacher != null ? 'Teacher: ' + attendance.teacher.name : 'Teacher: N/A'}">Teacher info</p>
+                        </div>
+                    </div>
+
+                    <form th:action="@{/attendances/edit/{id}(id=${attendance.id})}" method="post" class="space-y-5">
+                        <div class="flex items-center gap-3">
+                            <input type="checkbox" id="present" name="present" class="h-5 w-5 rounded border-gray-300 text-green-600 focus:ring-green-500" th:checked="${attendance.present}">
+                            <label for="present" class="text-sm font-medium text-gray-700">Mark student as present for this session</label>
+                        </div>
+
+                        <div>
+                            <label for="notes" class="block text-sm font-semibold text-gray-700 mb-2">Notes</label>
+                            <textarea id="notes" name="notes" rows="4" class="w-full rounded-md border border-gray-300 p-3 focus:border-blue-500 focus:ring focus:ring-blue-200" placeholder="Add optional context about the attendance" th:text="${attendance.notes}"></textarea>
+                            <p class="text-xs text-gray-400 mt-1">Notes are visible to other authorized users reviewing this attendance record.</p>
+                        </div>
+
+                        <div class="flex flex-wrap items-center gap-3">
+                            <button type="submit" class="inline-flex items-center gap-2 rounded-md bg-green-500 px-4 py-2 text-sm font-semibold text-white shadow hover:bg-green-600 transition">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                                Save Changes
+                            </button>
+                            <a th:href="@{/attendances/delete/{id}(id=${attendance.id})}" onclick="return confirm('Delete this attendance record?');" class="inline-flex items-center gap-2 rounded-md bg-red-500 px-4 py-2 text-sm font-semibold text-white shadow hover:bg-red-600 transition">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                                Delete Record
+                            </a>
+                            <a th:href="@{/attendances/list}" class="inline-flex items-center gap-2 rounded-md border border-gray-200 px-4 py-2 text-sm font-semibold text-gray-600 hover:bg-gray-100 transition">
+                                Cancel
+                            </a>
+                        </div>
+                    </form>
+                </div>
+
+                <div th:unless="${attendance}" class="rounded-lg border border-red-200 bg-red-50 p-6 text-red-700">
+                    <h3 class="text-lg font-semibold mb-2">Attendance record not found</h3>
+                    <p>Please return to the <a th:href="@{/attendances/list}" class="underline font-semibold">attendance list</a> and try again.</p>
+                </div>
+            </div>
+        </main>
+    </div>
+    <footer class="bg-blue-600 text-white p-4 text-center">
+        &copy; 2025 Learn Mate. All rights reserved.
+    </footer>
+</body>
+</html>

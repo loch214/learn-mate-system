@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+      th:replace="~{layout :: layout(~{::content}, 'Create Attendance')}">
+    <div th:fragment="content">
+        <h2 class="text-xl font-bold mb-4 text-blue-600">Mark Attendance</h2>
+        <form th:action="@{/attendances/create}" th:object="${attendance}" method="post">
+            <div class="mb-4">
+                <label for="timetable" class="block">Timetable</label>
+                <select th:field="*{timetable}" id="timetable" class="w-full border p-2 rounded">
+                    <option th:each="t : ${timetables}" th:value="${t.id}" th:text="${t.day} - ${t.startTime} to ${t.endTime}"></option>
+                </select>
+            </div>
+            <div class="mb-4">
+                <label for="student" class="block">Student</label>
+                <select th:field="*{student}" id="student" class="w-full border p-2 rounded">
+                    <option th:each="s : ${students}" th:value="${s.id}" th:text="${s.name}"></option>
+                </select>
+            </div>
+            <div class="mb-4">
+                <label for="date" class="block">Date</label>
+                <input type="date" th:field="*{date}" id="date" class="w-full border p-2 rounded">
+            </div>
+            <div class="mb-4">
+                <label for="present" class="block">Present</label>
+                <input type="checkbox" th:field="*{present}" id="present">
+            </div>
+            <button type="submit" class="bg-green-500 text-white py-2 px-4 rounded hover:bg-green-600 transition">Save</button>
+        </form>
+    </div>
+</html>

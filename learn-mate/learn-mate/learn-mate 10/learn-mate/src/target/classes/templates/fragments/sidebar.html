@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <title>Sidebar Fragment</title>
+</head>
+<body>
+    <aside th:fragment="modern-sidebar(activePage)" class="app-sidebar">
+        <div class="sidebar-group">
+            <div class="sidebar-title">Navigation</div>
+            <a th:href="@{/dashboard}" class="nav-link" th:classappend="${activePage} == 'dashboard' ? ' active' : ''">Dashboard</a>
+        </div>
+
+        <div class="sidebar-group" sec:authorize="hasRole('ADMIN')">
+            <div class="sidebar-title">Administration</div>
+            <a th:href="@{/users/list}" class="nav-link" th:classappend="${activePage} == 'users' ? ' active' : ''">Users</a>
+            <a th:href="@{/subjects/list}" class="nav-link" th:classappend="${activePage} == 'subjects' ? ' active' : ''">Subjects</a>
+            <a th:href="@{/classes/list}" class="nav-link" th:classappend="${activePage} == 'classes' ? ' active' : ''">Classes</a>
+            <a th:href="@{/reports}" class="nav-link" th:classappend="${activePage} == 'reports' ? ' active' : ''">Reports</a>
+            </div>
+
+        <div class="sidebar-group">
+            <div class="sidebar-title">Academic</div>
+            <!-- Timetables - Different URLs for different roles -->
+            <a sec:authorize="hasRole('STUDENT')" th:href="@{/timetables/student/view}" class="nav-link" th:classappend="${activePage} == 'timetables' ? ' active' : ''">Timetables</a>
+            <a sec:authorize="hasAnyRole('ADMIN','TEACHER')" th:href="@{/timetables/list}" class="nav-link" th:classappend="${activePage} == 'timetables' ? ' active' : ''">Timetables</a>
+            
+            <!-- Attendances - Different URLs for different roles -->
+            <a sec:authorize="hasRole('TEACHER')" th:href="@{/attendances/mark}" class="nav-link" th:classappend="${activePage} == 'attendances' ? ' active' : ''">Attendances</a>
+            <a sec:authorize="hasAnyRole('PARENT','STUDENT','ADMIN')" th:href="@{/attendances/list}" class="nav-link" th:classappend="${activePage} == 'attendances' ? ' active' : ''">Attendances</a>
+            
+            <a sec:authorize="hasAnyRole('TEACHER','STUDENT','PARENT','ADMIN')" th:href="@{/exams/list}" class="nav-link" th:classappend="${activePage} == 'exams' ? ' active' : ''">Exams</a>
+            <a sec:authorize="hasAnyRole('TEACHER','STUDENT','PARENT','ADMIN')" th:href="@{/marks/list}" class="nav-link" th:classappend="${activePage} == 'marks' ? ' active' : ''">Marks</a>
+            <a sec:authorize="hasAnyRole('ADMIN','TEACHER','STUDENT')" th:href="@{/materials/list}" class="nav-link" th:classappend="${activePage} == 'materials' ? ' active' : ''">Materials</a>
+            </div>
+
+        <div class="sidebar-group" sec:authorize="hasAnyRole('ADMIN','PARENT')">
+            <div class="sidebar-title">Financial</div>
+            <a th:href="@{/fees/list}" class="nav-link" th:classappend="${activePage} == 'fees' ? ' active' : ''">Fees</a>
+            </div>
+
+        <div class="sidebar-group">
+            <div class="sidebar-title">Personal</div>
+            <a th:href="@{/notifications/list}" class="nav-link" th:classappend="${activePage} == 'notifications' ? ' active' : ''">Notifications</a>
+            <a th:href="@{/users/profile}" class="nav-link" th:classappend="${activePage} == 'profile' ? ' active' : ''">Profile</a>
+            </div>
+    </aside>
+</body>
+</html>

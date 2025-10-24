@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+      th:replace="~{layout :: layout(~{::content}, 'Create Fee')}">
+    <div th:fragment="content">
+        <h2 class="text-xl font-bold mb-4 text-blue-600">Create Fee</h2>
+        <form th:action="@{/fees/create}" th:object="${fee}" method="post">
+            <div class="mb-4">
+                <label for="student" class="block">Student</label>
+                <select name="studentId" id="student" class="w-full border p-2 rounded">
+                    <option th:each="s : ${students}" th:value="${s.id}" th:text="${s.name}"></option>
+                </select>
+            </div>
+            <div class="mb-4">
+                <label for="subject" class="block">Subject</label>
+                <select name="subjectId" id="subject" class="w-full border p-2 rounded">
+                    <option th:each="sub : ${subjects}" th:value="${sub.id}" th:text="${sub.name}"></option>
+                </select>
+            </div>
+            <div class="mb-4">
+                <label for="amount" class="block">Amount</label>
+                <input type="number" step="0.01" th:field="*{amount}" id="amount" class="w-full border p-2 rounded">
+            </div>
+            <div class="mb-4">
+                <label for="dueDate" class="block">Due Date</label>
+                <input type="date" th:field="*{dueDate}" id="dueDate" class="w-full border p-2 rounded">
+            </div>
+            <div class="mb-4">
+                <label for="status" class="block">Status</label>
+                <select th:field="*{status}" id="status" class="w-full border p-2 rounded">
+                    <option value="PAID">PAID</option>
+                    <option value="PENDING">PENDING</option>
+                    <option value="OVERDUE">OVERDUE</option>
+                </select>
+            </div>
+            <div class="mb-4">
+                <label for="paymentDate" class="block">Payment Date</label>
+                <input type="date" th:field="*{paymentDate}" id="paymentDate" class="w-full border p-2 rounded">
+            </div>
+            <button type="submit" class="bg-green-500 text-white py-2 px-4 rounded hover:bg-green-600 transition">Save</button>
+        </form>
+    </div>
+</html>

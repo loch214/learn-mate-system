@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <title>Learn Mate - Reports</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdn.jsdelivr.net/npm/heroicons@2.0.18/outline.css" rel="stylesheet">
+    <link th:href="@{/css/main.css}" rel="stylesheet">
+</head>
+<body class="bg-gray-100 font-sans">
+    <header class="bg-blue-600 text-white p-4 flex justify-between items-center shadow-md">
+        <h1 class="text-2xl font-bold">Learn Mate</h1>
+        <nav>
+            <a th:href="@{/dashboard}" class="mx-2 hover:underline">Dashboard</a>
+            <a th:href="@{/logout}" class="mx-2 hover:underline">Logout</a>
+        </nav>
+    </header>
+    <div class="flex">
+        <aside class="w-64 bg-white h-screen p-4 shadow-md">
+            <ul>
+                <li sec:authorize="hasRole('ADMIN')"><a th:href="@{/users/list}" class="block py-2 hover:bg-blue-100 rounded transition">Users</a></li>
+                <li sec:authorize="hasRole('ADMIN')"><a th:href="@{/subjects/list}" class="block py-2 hover:bg-blue-100 rounded transition">Subjects</a></li>
+                <li sec:authorize="hasRole('ADMIN')"><a th:href="@{/classes/list}" class="block py-2 hover:bg-blue-100 rounded transition">Classes</a></li>
+                <li sec:authorize="hasAnyRole('ADMIN', 'TEACHER', 'STUDENT')"><a th:href="@{/timetables/list}" class="block py-2 hover:bg-blue-100 rounded transition">Timetables</a></li>
+                <li sec:authorize="hasAnyRole('TEACHER', 'PARENT', 'STUDENT')"><a th:href="@{/attendances/list}" class="block py-2 hover:bg-blue-100 rounded transition">Attendances</a></li>
+                <li sec:authorize="hasAnyRole('TEACHER', 'STUDENT', 'PARENT', 'ADMIN')"><a th:href="@{/exams/list}" class="block py-2 hover:bg-blue-100 rounded transition">Exams</a></li>
+                <li sec:authorize="hasAnyRole('TEACHER', 'STUDENT', 'PARENT', 'ADMIN')"><a th:href="@{/marks/list}" class="block py-2 hover:bg-blue-100 rounded transition">Marks</a></li>
+                <li sec:authorize="hasAnyRole('ADMIN', 'PARENT')"><a th:href="@{/fees/list}" class="block py-2 hover:bg-blue-100 rounded transition">Fees</a></li>
+                <li><a th:href="@{/notifications/list}" class="block py-2 hover:bg-blue-100 rounded transition">Notifications</a></li>
+                <li sec:authorize="hasRole('ADMIN')"><a th:href="@{/reports}" class="block py-2 bg-blue-100 rounded transition font-semibold">Reports</a></li>
+                <li><a th:href="@{/users/profile}" class="block py-2 hover:bg-blue-100 rounded transition">Profile</a></li>
+            </ul>
+        </aside>
+        <main class="flex-1 p-6">
+            <div class="bg-white p-6 rounded-lg shadow-md">
+                <h2 class="text-2xl font-bold mb-6 text-blue-600">Reports & Analytics</h2>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <div class="bg-gradient-to-r from-blue-50 to-blue-100 p-6 rounded-lg border border-blue-200 shadow-sm">
+                        <div class="flex items-center mb-4">
+                            <svg class="w-8 h-8 text-blue-600 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                            </svg>
+                            <h3 class="text-lg font-semibold text-blue-800">Attendance Reports</h3>
+                        </div>
+                        <p class="text-sm text-gray-600 mb-4">Generate detailed attendance reports for students, classes, and time periods</p>
+                        <div class="space-y-2">
+                            <a th:href="@{/reports/attendance/pdf}" 
+                               class="block bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-600 transition text-center">
+                                Download PDF Report
+                            </a>
+                            <a th:href="@{/reports/attendance/csv}" 
+                               class="block bg-green-500 text-white py-2 px-4 rounded-md hover:bg-green-600 transition text-center">
+                                Download CSV Data
+                            </a>
+                        </div>
+                    </div>
+
+                    <div class="bg-gradient-to-r from-green-50 to-green-100 p-6 rounded-lg border border-green-200 shadow-sm">
+                        <div class="flex items-center mb-4">
+                            <svg class="w-8 h-8 text-green-600 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+                            </svg>
+                            <h3 class="text-lg font-semibold text-green-800">Marks & Grades</h3>
+                        </div>
+                        <p class="text-sm text-gray-600 mb-4">Comprehensive grade reports with performance analysis and statistics</p>
+                        <div class="space-y-2">
+                            <a th:href="@{/reports/marks/pdf}" 
+                               class="block bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-600 transition text-center">
+                                Download PDF Report
+                            </a>
+                            <a th:href="@{/reports/marks/csv}" 
+                               class="block bg-green-500 text-white py-2 px-4 rounded-md hover:bg-green-600 transition text-center">
+                                Download CSV Data
+                            </a>
+                        </div>
+                    </div>
+
+                    <div class="bg-gradient-to-r from-purple-50 to-purple-100 p-6 rounded-lg border border-purple-200 shadow-sm">
+                        <div class="flex items-center mb-4">
+                            <svg class="w-8 h-8 text-purple-600 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                            </svg>
+                            <h3 class="text-lg font-semibold text-purple-800">Financial Reports</h3>
+                        </div>
+                        <p class="text-sm text-gray-600 mb-4">Fee collection reports, outstanding payments, and financial summaries</p>
+                        <div class="space-y-2">
+                            <a th:href="@{/reports/fees/pdf}" 
+                               class="block bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-600 transition text-center">
+                                Download PDF Report
+                            </a>
+                            <a th:href="@{/reports/fees/csv}" 
+                               class="block bg-green-500 text-white py-2 px-4 rounded-md hover:bg-green-600 transition text-center">
+                                Download CSV Data
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mt-8 p-4 bg-blue-50 rounded-lg border border-blue-200">
+                    <h4 class="font-semibold text-blue-800 mb-2">Report Information</h4>
+                    <ul class="text-sm text-blue-700 space-y-1">
+                        <li>• <strong>PDF Reports:</strong> Formatted reports suitable for printing and official documentation</li>
+                        <li>• <strong>CSV Data:</strong> Raw data exports for further analysis in spreadsheet applications</li>
+                        <li>• Reports are generated in real-time with the latest available data</li>
+                        <li>• All reports include timestamps and generation metadata</li>
+                    </ul>
+                </div>
+            </div>
+        </main>
+    </div>
+    <footer class="bg-blue-600 text-white p-4 text-center">
+        &copy; 2025 Learn Mate. All rights reserved.
+    </footer>
+</body>
+</html>

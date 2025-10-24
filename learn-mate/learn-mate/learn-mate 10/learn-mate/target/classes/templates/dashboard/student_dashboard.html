@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layout :: layout(~{::content}, 'Student Dashboard')}">
+<div th:fragment="content">
+    <div class="surface-card">
+        <div class="section-header">
+            <div>
+                <h2 class="page-title"><span class="icon">🎓</span>Student Dashboard</h2>
+                <p>Access your academic information and manage your learning journey.</p>
+            </div>
+            <a th:href="@{/users/profile}" class="btn btn-secondary">Manage Profile</a>
+        </div>
+    </div>
+
+    <div class="tile-grid cols-4">
+        <div class="tile-card">
+            <header>
+                <div>
+                    <h3>My Timetable</h3>
+                    <p>View your class schedule and upcoming lessons.</p>
+                </div>
+                <div class="tile-icon">🗓️</div>
+            </header>
+            <a th:href="@{/timetables/student/view}" class="btn btn-primary">View My Timetable</a>
+        </div>
+
+        <div class="tile-card">
+            <header>
+                <div>
+                    <h3>My Attendance</h3>
+                    <p>Check attendance history and spot trends.</p>
+                </div>
+                <div class="tile-icon">✅</div>
+            </header>
+            <a th:href="@{/attendances/list}" class="btn btn-success">View Attendance</a>
+        </div>
+
+        <div class="tile-card">
+            <header>
+                <div>
+                    <h3>My Results</h3>
+                    <p>Track your exam results and progress.</p>
+                </div>
+                <div class="tile-icon">📊</div>
+            </header>
+            <a th:href="@{/student-results}" class="btn btn-primary">View Results</a>
+        </div>
+
+        <div class="tile-card">
+            <header>
+                <div>
+                    <h3>Study Materials</h3>
+                    <p>Access resources shared by your teachers.</p>
+                </div>
+                <div class="tile-icon">📚</div>
+            </header>
+            <a th:href="@{/materials/list}" class="btn btn-secondary">Browse Materials</a>
+        </div>
+    </div>
+
+    <div class="surface-card">
+        <h3 class="text-xl font-semibold" style="margin-bottom: 1.5rem;">Quick Overview</h3>
+        <div class="grid-responsive three-columns">
+            <div class="stat-card">
+                <h3>Upcoming Exams</h3>
+                <p th:text="${upcomingExamsCount ?: 0}">0</p>
+            </div>
+            <div class="stat-card accent-green">
+                <h3>Attendance Rate</h3>
+                <p th:text="${attendanceRate ?: '0%'}">0%</p>
+            </div>
+            <div class="stat-card accent-purple" style="gap: 0.4rem;">
+                <h3>Last Notification</h3>
+                <p style="font-size:1rem;" th:text="${lastNotification ?: 'No recent notifications'}">No recent notifications</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="surface-card compact">
+        <h3 class="text-xl font-semibold" style="margin-bottom: 1.25rem;">Recent Activity</h3>
+        <div class="timeline">
+            <div class="timeline-item">
+                <h4>Stay on track</h4>
+                <p>Check your timetable daily to keep up with upcoming lessons.</p>
+            </div>
+            <div class="timeline-item">
+                <h4>Monitor attendance</h4>
+                <p>Review recent attendance records to maintain a strong presence.</p>
+            </div>
+            <div class="timeline-item">
+                <h4>Review study resources</h4>
+                <p>Download the latest materials shared by your teachers.</p>
+            </div>
+        </div>
+    </div>
+</div>
+</html>

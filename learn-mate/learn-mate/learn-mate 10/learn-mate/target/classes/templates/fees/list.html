@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+      th:replace="~{layout :: layout(~{::content}, 'Fees Management')}">
+<div th:fragment="content">
+    <div class="surface-card">
+        <style>
+            .fees-actions { display: flex; flex-wrap: wrap; gap: 0.5rem; align-items: flex-start; }
+            .fees-actions form { display: flex; flex-wrap: wrap; gap: 0.5rem; align-items: center; }
+            .fees-actions form input[type="number"],
+            .fees-actions form input[type="date"] { flex: 1 1 140px; min-width: 120px; max-width: 180px; }
+            .fees-actions form input[type="file"] { flex: 1 1 200px; min-width: 180px; }
+            .fees-actions form button { margin-left: 0; }
+            .fees-badge { white-space: nowrap; display: inline-flex; align-items: center; gap: 0.25rem; }
+            @media (max-width: 1024px) {
+                .fees-actions form { flex-direction: column; align-items: stretch; width: 100%; }
+                .fees-actions form input[type="number"],
+                .fees-actions form input[type="date"],
+                .fees-actions form input[type="file"],
+                .fees-actions form button { width: 100%; max-width: 100%; }
+            }
+        </style>
+        <div class="flex items-center justify-between mb-4">
+            <h2 class="page-title"><span class="icon">💳</span>Fees Management</h2>
+            <div class="text-sm text-gray-500">
+                <span class="font-medium" th:text="${currentUserRole}">User</span>
+            </div>
+        </div>
+        <div class="grid gap-6">
+            <!-- Search Form (Admins only) -->
+            <form sec:authorize="hasRole('ADMIN')" th:action="@{/fees/search}" method="get" class="bg-gray-50 p-4 rounded-lg">
+                <div class="flex flex-wrap gap-4 items-end">
+                    <div class="flex-1 min-w-[220px]">
+                        <label for="studentId" class="block text-sm font-medium text-gray-700 mb-1">Search by Student ID</label>
+                        <input type="number" id="studentId" name="studentId" placeholder="Enter student ID"
+                               class="border border-gray-300 p-2 rounded-md focus:ring-blue-500 focus:border-blue-500 w-full">
+                    </div>
+                    <button type="submit" class="btn btn-success">Search</button>
+                    <a th:href="@{/fees/list}" class="btn btn-secondary">Show All</a>
+                </div>
+            </form>
+
+            <!-- Search Results Header -->
+            <div th:if="${searchStudentName != null}" class="bg-blue-50 border-l-4 border-blue-400 rounded p-4">
+                <h3 class="text-lg font-semibold text-blue-800">
+                    Fee Details for Student: <span th:text="${searchStudentName}">Student Name</span>
+                    (ID: <span th:text="${searchStudentId}">123</span>)
+                </h3>
+            </div>
+
+            <!-- Error Message -->
+            <div th:if="${error != null}" class="bg-red-50 border-l-4 border-red-400 rounded p-4">
+                <p class="text-red-800" th:text="${error}">Error message</p>
+            </div>
+
+            <div class="overflow-x-auto">
+                <table class="w-full border-collapse bg-white shadow-sm rounded-lg overflow-hidden">
+                    <thead>
+                    <tr class="bg-blue-50 border-b border-blue-100">
+                        <th class="p-4 text-left font-semibold text-blue-900">ID</th>
+                        <th class="p-4 text-left font-semibold text-blue-900">Student</th>
+                        <th class="p-4 text-left font-semibold text-blue-900">Subject</th>
+                        <th class="p-4 text-left font-semibold text-blue-900">Grade</th>
+                        <th class="p-4 text-left font-semibold text-blue-900">Amount</th>
+                        <th class="p-4 text-left font-semibold text-blue-900">Due Date</th>
+                        <th class="p-4 text-left font-semibold text-blue-900">Status</th>
+                        <th class="p-4 text-left font-semibold text-blue-900">Actions</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="fee : ${fees}" class="border-b border-gray-100 hover:bg-gray-50 transition">
+                        <td class="p-4" th:text="${fee.id}">1</td>
+                        <td class="p-4">
+                            <div class="font-medium text-gray-900" th:text="${fee.student.name}">John Doe</div>
+                            <div class="text-sm text-gray-500" th:text="${fee.student.email}">john.doe@example.com</div>
+                        </td>
+                        <td class="p-4">
+                            <span th:if="${fee.subject != null}" class="fees-badge bg-blue-100 text-blue-800 px-2 py-1 rounded text-sm font-medium" th:text="${fee.subject.name}">Mathematics</span>
+                            <span th:if="${fee.subject == null}" class="text-gray-500 text-sm">No subject</span>
+                        </td>
+                        <td class="p-4">
+                            <span th:if="${fee.schoolClass != null}" class="fees-badge bg-green-100 text-green-800 px-3 py-1 rounded text-sm font-medium" th:text="${fee.schoolClass.name}">Grade 6</span>
+                            <span th:if="${fee.schoolClass == null}" class="text-gray-500 text-sm">No grade</span>
+                        </td>
+                        <td class="p-4">
+                            <div class="flex flex-col">
+                                <span class="font-semibold text-green-600" th:text="${'$' + #numbers.formatDecimal(fee.amount, 0, 2)}">$250.00</span>
+                                <span th:if="${fee.submittedAmount != null}" class="text-xs text-gray-500">Submitted: <span th:text="${'$' + #numbers.formatDecimal(fee.submittedAmount, 0, 2)}">$0.00</span></span>
+                            </div>
+                        </td>
+                        <td class="p-4">
+                            <div class="flex flex-col">
+                                <span th:text="${#temporals.format(fee.dueDate, 'dd/MM/yyyy')}">15/01/2025</span>
+                                <span th:if="${fee.submittedDate != null}" class="text-xs text-gray-500">Slip Date: <span th:text="${#temporals.format(fee.submittedDate, 'dd/MM/yyyy')}">15/01/2025</span></span>
+                            </div>
+                        </td>
+                        <td class="p-4">
+                                    <span th:class="${fee.status == 'PAID' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'} + ' px-3 py-1 rounded-full text-xs font-semibold'"
+                                          th:text="${fee.status}">PENDING</span>
+                        </td>
+                        <td class="p-4">
+                            <div class="fees-actions">
+                                <a th:if="${fee.paymentSlipPath != null}" th:href="@{/uploads/payment-slips/{file}(file=${fee.paymentSlipPath})}"
+                                   class="bg-gray-500 text-white px-3 py-1 rounded text-sm hover:bg-gray-600 transition" target="_blank">View Slip</a>
+                                <a sec:authorize="hasRole('ADMIN')" th:href="@{/fees/edit/{id}(id=${fee.id})}"
+                                   class="bg-blue-500 text-white px-3 py-1 rounded text-sm hover:bg-blue-600 transition">
+                                    Edit
+                                </a>
+                                <form sec:authorize="hasRole('ADMIN')" th:if="${fee.status == 'PAID_PENDING'}" th:action="@{/fees/verify/{id}(id=${fee.id})}" method="post">
+                                    <button type="submit" class="bg-green-600 text-white px-3 py-1 rounded text-sm hover:bg-green-700 transition">
+                                        Verify
+                                    </button>
+                                </form>
+                                <!-- Parent pay button: rendered when no slip yet and pending/overdue -->
+                                <form th:if="${#authorization.expression('hasRole(''PARENT'')') and (fee.status == 'PENDING' or fee.status == 'OVERDUE')}" th:action="@{/fees/parent-pay}" method="post" enctype="multipart/form-data">
+                                    <input type="hidden" name="studentId" th:value="${fee.student.id}">
+                                    <input type="hidden" name="subjectId" th:value="${fee.subject != null ? fee.subject.id : 0}">
+                                    <input name="amount" type="number" step="0.01" min="0.01" required class="border rounded px-2 py-1 text-sm" placeholder="Amount">
+                                    <input name="slipDate" type="date" required class="border rounded px-2 py-1 text-sm">
+                                    <input name="slip" type="file" accept="image/*,application/pdf" required class="text-sm">
+                                    <button type="submit" class="bg-green-500 text-white px-3 py-1 rounded text-sm hover:bg-green-600 transition">Pay</button>
+                                </form>
+                                <a sec:authorize="hasRole('ADMIN')" th:href="@{/fees/delete/{id}(id=${fee.id})}"
+                                   class="bg-red-500 text-white px-3 py-1 rounded text-sm hover:bg-red-600 transition"
+                                   onclick="return confirm('Are you sure you want to delete this fee record?')">
+                                    Delete
+                                </a>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr th:if="${#lists.isEmpty(fees)}">
+                        <td colspan="8" class="p-8 text-center text-gray-500">
+                            No fee records found. <a th:href="@{/fees/create}" class="text-blue-500 hover:underline">Create the first fee record</a>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="flex flex-wrap gap-4 items-center justify-between pt-4">
+                <div class="flex gap-3">
+                    <a sec:authorize="hasRole('ADMIN')" th:href="@{/fees/create}"
+                       class="btn btn-success">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+                        </svg>
+                        Create New Fee
+                    </a>
+
+                    <a sec:authorize="hasRole('ADMIN')" th:href="@{/fees/create-subject-fee}"
+                       class="btn btn-primary">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+                        </svg>
+                        Create Subject Fee
+                    </a>
+                </div>
+
+                <div class="text-sm text-gray-600">
+                    Total fees: <span class="font-semibold" th:text="${#lists.size(fees)}">0</span>
+                </div>
+            </div>
+        </div>
+        </div>
+    </div>
+</html>

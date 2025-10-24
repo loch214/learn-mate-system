@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <title>Learn Mate - Mark Attendance</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdn.jsdelivr.net/npm/heroicons@2.0.18/outline.css" rel="stylesheet">
+    <link th:href="@{/css/main.css}" rel="stylesheet">
+</head>
+<body class="bg-gray-100 font-sans">
+    <header class="bg-blue-600 text-white p-4 flex justify-between items-center shadow-md">
+        <h1 class="text-2xl font-bold">Learn Mate</h1>
+        <nav>
+            <a th:href="@{/dashboard}" class="mx-2 hover:underline">Dashboard</a>
+            <a th:href="@{/logout}" class="mx-2 hover:underline">Logout</a>
+        </nav>
+    </header>
+    <div class="flex">
+        <div th:replace="~{fragments/sidebar :: modern-sidebar('attendances')}"></div>
+        <main class="flex-1 p-6">
+            <div class="bg-white p-6 rounded-lg shadow-md">
+        <div class="mb-6">
+            <nav class="flex items-center space-x-2 text-sm text-gray-500 mb-4">
+                <a href="/attendances/mark" class="hover:text-blue-600">Select Class</a>
+                <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"></path></svg>
+                <span class="text-gray-900" th:text="${schoolClass.name}">Current Class</span>
+            </nav>
+            
+            <div class="flex items-center justify-between">
+                <div>
+                    <h2 class="text-2xl font-bold text-blue-600" th:text="'Mark Attendance - ' + ${schoolClass.name}">Mark Attendance - Class Name</h2>
+                    <p class="text-gray-600 mt-1">
+                        <span th:text="${#temporals.format(attendanceDate, 'EEEE, MMMM d, yyyy')}">Date</span>
+                        <span class="mx-2">•</span>
+                        <span th:text="${#lists.size(students)} + ' students'">Student count</span>
+                        <span th:if="${subject != null}" class="mx-2">•</span>
+                        <span th:if="${subject != null}" class="font-medium text-blue-600" th:text="'Subject: ' + ${subject.name}">Subject</span>
+                    </p>
+                    <p class="text-sm text-gray-500 mt-1">
+                        <span th:text="'Teacher: ' + ${teacher.name}">Teacher Name</span>
+                    </p>
+                </div>
+                <div class="flex space-x-2">
+                    <button type="button" onclick="markAllPresent()" class="bg-green-500 text-white py-2 px-4 rounded-lg hover:bg-green-600 transition duration-200 text-sm font-medium">
+                        Mark All Present
+                    </button>
+                    <button type="button" onclick="markAllAbsent()" class="bg-red-500 text-white py-2 px-4 rounded-lg hover:bg-red-600 transition duration-200 text-sm font-medium">
+                        Mark All Absent
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Warning for existing attendance -->
+        <div th:if="${!#lists.isEmpty(existingAttendances)}" class="mb-6 p-4 bg-yellow-100 border border-yellow-400 text-yellow-700 rounded-lg">
+            <div class="flex items-center">
+                <svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"></path>
+                </svg>
+                <span>Attendance has already been marked for this class on this date. Submitting this form will overwrite the existing records.</span>
+            </div>
+        </div>
+
+        <div class="bg-white rounded-lg shadow-md">
+            <form th:action="@{/attendances/mark/{classId}(classId=${schoolClass.id})}" method="post" onsubmit="return confirmSubmission()">
+                <input type="hidden" name="date" th:value="${attendanceDate}">
+                <input type="hidden" name="subjectId" th:value="${subject?.id}">
+                
+                <!-- Notes Section -->
+                <div class="p-6 border-b border-gray-200">
+                    <label for="notes" class="block text-sm font-medium text-gray-700 mb-2">Notes (Optional)</label>
+                    <textarea id="notes" name="notes" rows="2" 
+                              placeholder="Add any notes about this attendance session..."
+                              class="w-full border border-gray-300 p-3 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                              th:text="${sessionNotes}"></textarea>
+                </div>
+                
+                <div class="p-6">
+                    <div th:if="${#lists.isEmpty(students)}" class="text-center py-8">
+                        <div class="text-gray-500">
+                            <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.25 2.25 0 11-4.5 0 2.25 2.25 0 014.5 0z" />
+                            </svg>
+                            <h3 class="mt-2 text-sm font-medium text-gray-900">No Students Enrolled</h3>
+                            <p class="mt-1 text-sm text-gray-500">This class doesn't have any students enrolled yet.</p>
+                        </div>
+                    </div>
+
+                    <div th:unless="${#lists.isEmpty(students)}" class="space-y-1">
+                        <div class="grid grid-cols-12 gap-4 font-medium text-gray-700 border-b pb-2 mb-4">
+                            <div class="col-span-1">#</div>
+                            <div class="col-span-6">Student Name</div>
+                            <div class="col-span-3">Student ID</div>
+                            <div class="col-span-2 text-center">Attendance</div>
+                        </div>
+                        
+                        <div th:each="student, iterStat : ${students}"
+                             th:with="existingAttendance=${existingAttendanceMap != null and existingAttendanceMap.containsKey(student.id) ? existingAttendanceMap[student.id] : null}"
+                             class="grid grid-cols-12 gap-4 items-center py-3 border-b border-gray-100 hover:bg-gray-50 rounded transition-colors">
+                            <div class="col-span-1 text-gray-500 font-medium" th:text="${iterStat.count}">1</div>
+                            
+                            <div class="col-span-6">
+                                <div class="flex items-center">
+                                    <div class="flex-shrink-0 h-10 w-10">
+                                        <div class="h-10 w-10 rounded-full bg-blue-500 flex items-center justify-center text-white font-semibold text-sm"
+                                             th:text="${#strings.substring(student.name, 0, 1).toUpperCase()}">A</div>
+                                    </div>
+                                    <div class="ml-3">
+                                        <div class="text-sm font-medium text-gray-900" th:text="${student.name}">Student Name</div>
+                                        <div class="text-sm text-gray-500" th:text="${student.email}">student@example.com</div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="col-span-3 text-sm text-gray-600" th:text="${student.id}">ID</div>
+                            
+                            <div class="col-span-2 text-center">
+                                <label class="inline-flex items-center cursor-pointer">
+                                    <input type="checkbox" 
+                                           th:name="'attendance_' + ${student.id}" 
+                                           th:id="'attendance_' + ${student.id}"
+                                           class="sr-only attendance-checkbox"
+                                           th:checked="${presentStudentIds != null and presentStudentIds.contains(student.id)}">
+                                    <div class="relative">
+                                        <div class="w-10 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-green-600"></div>
+                                        <span class="ml-3 text-sm font-medium text-gray-900 present-text" th:classappend="${presentStudentIds != null and presentStudentIds.contains(student.id)} ? '' : ' hidden'">Present</span>
+                                        <span class="ml-3 text-sm font-medium text-gray-900 absent-text" th:classappend="${presentStudentIds != null and presentStudentIds.contains(student.id)} ? ' hidden' : ''">Absent</span>
+                                    </div>
+                                </label>
+                                <div class="mt-2 text-xs text-gray-500" th:if="${existingAttendance != null}">
+                                    <span th:text="${existingAttendance.present ? 'Previously: Present' : 'Previously: Absent'}"></span>
+                                </div>
+                                <div class="mt-1 text-[11px] text-gray-400" th:if="${existingAttendance != null and existingAttendance.notes != null}">
+                                    <span th:text="${'Last note: ' + existingAttendance.notes}"></span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div th:unless="${#lists.isEmpty(students)}" class="border-t bg-gray-50 px-6 py-4">
+                    <div class="flex items-center justify-between">
+                        <div class="text-sm text-gray-600">
+                            <span id="presentCount">0</span> present, 
+                            <span id="absentCount" th:text="${#lists.size(students)}">0</span> absent out of 
+                            <span th:text="${#lists.size(students)}">0</span> students
+                        </div>
+                        <div class="flex space-x-3">
+                            <a href="/attendances/mark" class="bg-gray-500 text-white py-2 px-6 rounded-lg hover:bg-gray-600 transition duration-200 font-medium">
+                                Cancel
+                            </a>
+                            <button type="submit" class="bg-blue-500 text-white py-2 px-6 rounded-lg hover:bg-blue-600 transition duration-200 font-medium">
+                                Save Attendance
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+
+        <script>
+            // Initialize attendance state
+            document.addEventListener('DOMContentLoaded', function() {
+                updateAttendanceCounts();
+                
+                // Add event listeners to checkboxes
+                document.querySelectorAll('.attendance-checkbox').forEach(function(checkbox) {
+                    checkbox.addEventListener('change', function() {
+                        updateAttendanceDisplay(this);
+                        updateAttendanceCounts();
+                    });
+                    
+                    // Initialize display for each checkbox
+                    updateAttendanceDisplay(checkbox);
+                });
+            });
+
+            function updateAttendanceDisplay(checkbox) {
+                const container = checkbox.closest('.col-span-2');
+                const presentText = container.querySelector('.present-text');
+                const absentText = container.querySelector('.absent-text');
+                const toggle = container.querySelector('div.relative > div');
+                
+                if (checkbox.checked) {
+                    presentText.classList.remove('hidden');
+                    absentText.classList.add('hidden');
+                    toggle.classList.add('peer-checked:bg-green-600');
+                    toggle.classList.remove('bg-gray-200');
+                } else {
+                    presentText.classList.add('hidden');
+                    absentText.classList.remove('hidden');
+                    toggle.classList.remove('peer-checked:bg-green-600');
+                    toggle.classList.add('bg-gray-200');
+                }
+            }
+
+            function updateAttendanceCounts() {
+                const checkboxes = document.querySelectorAll('.attendance-checkbox');
+                const totalStudents = checkboxes.length;
+                let presentCount = 0;
+                
+                checkboxes.forEach(function(checkbox) {
+                    if (checkbox.checked) {
+                        presentCount++;
+                    }
+                });
+                
+                document.getElementById('presentCount').textContent = presentCount;
+                document.getElementById('absentCount').textContent = totalStudents - presentCount;
+            }
+
+            function markAllPresent() {
+                document.querySelectorAll('.attendance-checkbox').forEach(function(checkbox) {
+                    checkbox.checked = true;
+                    updateAttendanceDisplay(checkbox);
+                });
+                updateAttendanceCounts();
+            }
+
+            function markAllAbsent() {
+                document.querySelectorAll('.attendance-checkbox').forEach(function(checkbox) {
+                    checkbox.checked = false;
+                    updateAttendanceDisplay(checkbox);
+                });
+                updateAttendanceCounts();
+            }
+
+            function confirmSubmission() {
+                const presentCount = parseInt(document.getElementById('presentCount').textContent);
+                const absentCount = parseInt(document.getElementById('absentCount').textContent);
+                
+                return confirm(`Are you sure you want to save attendance?\n\nPresent: ${presentCount}\nAbsent: ${absentCount}\n\nThis will overwrite any existing attendance records for this date.`);
+            }
+        </script>
+
+        <style>
+            /* Custom toggle switch styling */
+            .attendance-checkbox:checked + div > div {
+                background-color: #10b981;
+            }
+            
+            .attendance-checkbox:checked + div > div:after {
+                transform: translateX(100%);
+            }
+            
+            .attendance-checkbox + div > div {
+                background-color: #e5e7eb;
+                transition: background-color 0.2s;
+            }
+            
+            .attendance-checkbox + div > div:after {
+                transition: transform 0.2s;
+            }
+        </style>
+            </div>
+        </main>
+    </div>
+    <footer class="bg-blue-600 text-white p-4 text-center">
+        &copy; 2025 Learn Mate. All rights reserved.
+    </footer>
+</body>
+</html>

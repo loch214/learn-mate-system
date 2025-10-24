@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+      th:fragment="layout(content, pageTitle)">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${pageTitle != null ? pageTitle + ' · Learn Mate' : 'Learn Mate'}">Learn Mate</title>
+    <link th:href="@{/css/main.css}" rel="stylesheet">
+</head>
+<body>
+        <header class="app-header">
+            <div class="brand">
+                <div class="brand-icon">LM</div>
+                <div>
+                    <div>Learn Mate</div>
+                    <small style="opacity:0.85;font-weight:500;letter-spacing:0.04em;">Smart School Management</small>
+                </div>
+            </div>
+            <nav class="header-actions">
+                <a th:href="@{/dashboard}">Dashboard</a>
+                <a th:href="@{/users/profile}">My Profile</a>
+                <a th:href="@{/logout}" class="btn btn-text" style="color:white;">Logout</a>
+            </nav>
+        </header>
+
+        <div class="app-shell">
+            <aside class="app-sidebar">
+                <div class="sidebar-group" th:if="${isAdmin}">
+                    <div class="sidebar-title">Administration</div>
+                    <a th:href="@{/users/list}" class="nav-link" th:classappend="${activePage} == 'users' ? ' active' : ''">Users</a>
+                    <a th:href="@{/subjects/list}" class="nav-link" th:classappend="${activePage} == 'subjects' ? ' active' : ''">Subjects</a>
+                    <a th:href="@{/classes/list}" class="nav-link" th:classappend="${activePage} == 'classes' ? ' active' : ''">Classes</a>
+                    <a th:href="@{/reports}" class="nav-link" th:classappend="${activePage} == 'reports' ? ' active' : ''">Reports</a>
+                </div>
+
+                <div class="sidebar-group">
+                    <div class="sidebar-title">Academic</div>
+                          <a class="nav-link"
+                              th:if="${(isAdmin != null ? isAdmin : false) or (isTeacher != null ? isTeacher : false) or (isStudent != null ? isStudent : false)}"
+                              th:href="${isTeacher} ? @{/timetables/weekly} : (${isStudent} ? @{/timetables/student/view} : @{/timetables/list})"
+                              th:classappend="${activePage} == 'timetables' ? ' active' : ''">Timetables</a>
+                          <a class="nav-link"
+                              th:if="${(isTeacher?:false) or (isParent?:false) or (isStudent?:false) or (isAdmin?:false)}"
+                              th:href="${isTeacher} ? @{/attendances/mark} : @{/attendances/list}"
+                              th:classappend="${activePage} == 'attendances' ? ' active' : ''">Attendances</a>
+                    <a th:href="@{/exams/list}" class="nav-link" th:if="${(isTeacher?:false) or (isStudent?:false) or (isParent?:false) or (isAdmin?:false)}" th:classappend="${activePage} == 'exams' ? ' active' : ''">Exams</a>
+                    <a th:href="@{/marks/list}" class="nav-link" th:if="${(isTeacher?:false) or (isStudent?:false) or (isParent?:false) or (isAdmin?:false)}" th:classappend="${activePage} == 'marks' ? ' active' : ''">Marks</a>
+                    <a th:href="@{/materials/list}" class="nav-link" th:if="${(isAdmin?:false) or (isTeacher?:false) or (isStudent?:false)}" th:classappend="${activePage} == 'materials' ? ' active' : ''">Materials</a>
+                </div>
+
+                <div class="sidebar-group" th:if="${(isAdmin?:false) or (isParent?:false)}">
+                    <div class="sidebar-title">Financial</div>
+                    <a th:href="@{/fees/list}" class="nav-link" th:classappend="${activePage} == 'fees' ? ' active' : ''">Fees</a>
+                </div>
+
+                <div class="sidebar-group">
+                    <div class="sidebar-title">Personal</div>
+                    <a th:href="@{/notifications/list}" class="nav-link" th:classappend="${activePage} == 'notifications' ? ' active' : ''">Notifications</a>
+                    <a th:href="@{/users/profile}" class="nav-link" th:classappend="${activePage} == 'profile' ? ' active' : ''">Profile</a>
+                </div>
+            </aside>
+
+            <main class="app-main">
+                <div th:replace="${content}"></div>
+            </main>
+        </div>
+
+        <footer class="app-footer">
+            &copy; <span th:text="${#dates.format(#dates.createNow(), 'yyyy')}">2025</span> Learn Mate. Crafted for smarter learning communities.
+        </footer>
+</body>
+</html>

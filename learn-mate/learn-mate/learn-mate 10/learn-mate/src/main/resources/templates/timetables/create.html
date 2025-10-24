@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <title>Learn Mate - Create Timetable</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdn.jsdelivr.net/npm/heroicons@2.0.18/outline.css" rel="stylesheet">
+    <link th:href="@{/css/main.css}" rel="stylesheet">
+</head>
+<body class="bg-gray-100 font-sans">
+    <header class="bg-blue-600 text-white p-4 flex justify-between items-center shadow-md">
+        <h1 class="text-2xl font-bold">Learn Mate</h1>
+        <nav>
+            <a th:href="@{/dashboard}" class="mx-2 hover:underline">Dashboard</a>
+            <a th:href="@{/logout}" class="mx-2 hover:underline">Logout</a>
+        </nav>
+    </header>
+    <div class="flex">
+        <div th:replace="~{fragments/sidebar :: modern-sidebar('timetables')}"></div>
+        <main class="flex-1 p-6">
+            <div class="bg-white p-6 rounded-lg shadow-md">
+        <h2 class="text-xl font-bold mb-4 text-blue-600">Create Timetable</h2>
+        
+        <!-- Error Message -->
+        <div th:if="${error}" class="mb-4 p-4 bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
+            <span th:text="${error}"></span>
+        </div>
+        
+        <form th:action="@{/timetables/create}" method="post">
+            <input type="hidden" name="classId" th:value="${param.classId != null ? param.classId[0] : ''}">
+            <input type="hidden" name="day" th:value="${timetable.day}">
+            <input type="hidden" name="startTime" th:value="${timetable.startTime}">
+            <input type="hidden" name="endTime" th:value="${timetable.endTime}">
+            
+            <!-- Display selected day and time -->
+            <div class="mb-6 p-4 bg-blue-50 rounded-lg">
+                <h3 class="text-lg font-semibold text-blue-800 mb-2">Schedule Details</h3>
+                <p class="text-blue-700"><strong>Day:</strong> <span th:text="${timetable.day}">Monday</span></p>
+                <p class="text-blue-700"><strong>Time:</strong> <span th:text="${timetable.startTime}">08:00</span> - <span th:text="${timetable.endTime}">09:00</span></p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div class="mb-4">
+                    <label for="subjectId" class="block text-sm font-medium text-gray-700 mb-2">Subject <span class="text-red-500">*</span></label>
+                    <select name="subjectId" id="subjectId" class="w-full border border-gray-300 p-3 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500" required>
+                        <option value="">Select a subject</option>
+                        <option th:each="subject : ${subjects}" th:value="${subject.id}" th:text="${subject.name}"></option>
+                    </select>
+                </div>
+                
+                <div class="mb-4">
+                    <label for="teacherId" class="block text-sm font-medium text-gray-700 mb-2">Teacher <span class="text-red-500">*</span></label>
+                    <select name="teacherId" id="teacherId" class="w-full border border-gray-300 p-3 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500" required>
+                        <option value="">Select a teacher</option>
+                        <option th:each="teacher : ${teachers}" th:value="${teacher.id}" th:text="${teacher.name}"></option>
+                    </select>
+                </div>
+            </div>
+            
+            <div class="mb-4">
+                <label for="room" class="block text-sm font-medium text-gray-700 mb-2">Room <span class="text-red-500">*</span></label>
+                <input type="text" name="room" id="room" class="w-full border border-gray-300 p-3 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500" placeholder="Enter room number/name" required>
+            </div>
+
+            <div class="flex justify-end space-x-4">
+                <a th:href="@{/timetables/weekly(classId=${param.classId != null ? param.classId[0] : ''})}" class="bg-gray-500 text-white py-2 px-4 rounded-lg hover:bg-gray-600 transition duration-200">Cancel</a>
+                <button type="submit" class="bg-green-500 text-white py-2 px-4 rounded-lg hover:bg-green-600 transition duration-200 font-medium">Add</button>
+            </div>
+        </form>
+            </div>
+        </main>
+    </div>
+    <footer class="bg-blue-600 text-white p-4 text-center">
+        &copy; 2025 Learn Mate. All rights reserved.
+    </footer>
+</body>
+</html>

@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+      th:replace="~{layout :: layout(~{::content}, 'Edit User')}">
+    <div th:fragment="content">
+        <h2 class="text-xl font-bold mb-4 text-blue-600">Edit User</h2>
+        <form th:action="@{/users/edit/{id}(id=${user.id})}" th:object="${user}" method="post">
+            <div class="mb-4">
+                <label for="username" class="block">Username</label>
+                <input type="text" th:field="*{username}" id="username" class="w-full border p-2 rounded">
+                <p th:if="#{fields.hasErrors('username')}" th:errors="*{username}" class="text-red-500"></p>
+            </div>
+            <div class="mb-4">
+                <label for="password" class="block">Password (leave blank to keep current)</label>
+                <input type="password" th:field="*{password}" id="password" class="w-full border p-2 rounded">
+            </div>
+            <div class="mb-4">
+                <label for="email" class="block">Email</label>
+                <input type="email" th:field="*{email}" id="email" class="w-full border p-2 rounded">
+                <p th:if="#{fields.hasErrors('email')}" th:errors="*{email}" class="text-red-500"></p>
+            </div>
+            <div class="mb-4">
+                <label for="name" class="block">Name</label>
+                <input type="text" th:field="*{name}" id="name" class="w-full border p-2 rounded">
+                <p th:if="#{fields.hasErrors('name')}" th:errors="*{name}" class="text-red-500"></p>
+            </div>
+            <div class="mb-4">
+                <label for="contact" class="block">Contact</label>
+                <input type="text" th:field="*{contact}" id="contact" class="w-full border p-2 rounded">
+            </div>
+            <div class="mb-4">
+                <label for="role" class="block">Role</label>
+                <select th:field="*{role}" id="role" class="w-full border p-2 rounded">
+                    <option th:each="r : ${T(com.learnmate.model.Role).values()}" th:value="${r}" th:text="${r}" th:selected="${r == user.role}"></option>
+                </select>
+            </div>
+            <button type="submit" class="bg-green-500 text-white py-2 px-4 rounded hover:bg-green-600 transition">Update</button>
+        </form>
+    </div>
+</html>

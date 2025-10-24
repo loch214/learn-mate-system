@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+      th:replace="~{layout :: layout(~{::content}, 'Select Class and Exam')}">
+    <div th:fragment="content">
+        <h2 class="text-2xl font-bold mb-6 text-blue-600">Bulk Mark Entry - Select Class and Exam</h2>
+        
+        <!-- Success/Error Messages -->
+        <div th:if="${success}" class="mb-4 p-4 bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded">
+            <span th:text="${success}"></span>
+        </div>
+        <div th:if="${error}" class="mb-4 p-4 bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
+            <span th:text="${error}"></span>
+        </div>
+
+        <div class="bg-white rounded-lg shadow-md p-6">
+            <p class="text-gray-600 mb-6">Select a class and exam to enter marks for all students in that class.</p>
+            
+            <form id="classExamForm" method="get">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                    <!-- Class Selection -->
+                    <div>
+                        <label for="classId" class="block text-sm font-medium text-gray-700 mb-2">Select Class</label>
+                        <select id="classId" name="classId" required 
+                                class="w-full border border-gray-300 p-3 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                            <option value="">Choose a class...</option>
+                            <option th:each="schoolClass : ${schoolClasses}" 
+                                    th:value="${schoolClass.id}" 
+                                    th:text="${schoolClass.name}">Class Name</option>
+                        </select>
+                    </div>
+
+                    <!-- Exam Selection -->
+                    <div>
+                        <label for="examId" class="block text-sm font-medium text-gray-700 mb-2">Select Exam</label>
+                        <select id="examId" name="examId" required 
+                                class="w-full border border-gray-300 p-3 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                            <option value="">Choose an exam...</option>
+                            <option th:each="exam : ${exams}" 
+                                    th:value="${exam.id}" 
+                                    th:text="${exam.subject.name + ' - ' + exam.grade + ' (' + #temporals.format(exam.date, 'MMM dd, yyyy') + ')'}">Exam Details</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="flex justify-center">
+                    <button type="button" onclick="proceedToMarkEntry()" 
+                            class="bg-blue-500 text-white py-3 px-6 rounded-lg hover:bg-blue-600 transition duration-200 font-medium">
+                        Proceed to Mark Entry
+                    </button>
+                </div>
+            </form>
+
+            <!-- Empty State -->
+            <div th:if="${#lists.isEmpty(schoolClasses) or #lists.isEmpty(exams)}" class="text-center py-8">
+                <div class="text-gray-500">
+                    <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+                    </svg>
+                    <h3 class="mt-2 text-sm font-medium text-gray-900">Setup Required</h3>
+                    <p class="mt-1 text-sm text-gray-500" th:if="${#lists.isEmpty(schoolClasses)}">
+                        No classes are available. Please contact an administrator to set up classes.
+                    </p>
+                    <p class="mt-1 text-sm text-gray-500" th:if="${#lists.isEmpty(exams)}">
+                        No exams are available. Please create an exam first before entering marks.
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <script>
+        function proceedToMarkEntry() {
+            const classId = document.getElementById('classId').value;
+            const examId = document.getElementById('examId').value;
+            
+            if (!classId || !examId) {
+                alert('Please select both a class and an exam.');
+                return;
+            }
+            
+            window.location.href = `/marks/bulk/${classId}/exam/${examId}`;
+        }
+        </script>
+    </div>
+</html>

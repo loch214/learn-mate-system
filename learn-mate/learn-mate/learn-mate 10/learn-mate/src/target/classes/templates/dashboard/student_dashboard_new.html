@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <title>Student Dashboard - Learn Mate</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdn.jsdelivr.net/npm/heroicons@2.0.18/outline.css" rel="stylesheet">
+    <link th:href="@{/css/main.css}" rel="stylesheet">
+</head>
+<body class="bg-gray-100 font-sans">
+    <header class="bg-blue-600 text-white p-4 flex justify-between items-center shadow-lg">
+        <h1 class="text-2xl font-bold">Learn Mate - Student Portal</h1>
+        <div class="flex items-center space-x-4">
+            <span class="text-sm">Welcome, <span th:text="${#authentication.name}">Student</span></span>
+            <a th:href="@{/logout}" class="bg-red-500 hover:bg-red-600 px-4 py-2 rounded transition">Logout</a>
+        </div>
+    </header>
+
+    <div class="flex">
+        <div th:replace="~{fragments/sidebar :: modern-sidebar('dashboard')}"></div>
+        <main class="flex-1 p-6">
+            <!-- Welcome Section -->
+            <div class="bg-white rounded-lg shadow-lg p-6 mb-6">
+                <h2 class="text-3xl font-bold text-gray-800 mb-2">Student Dashboard</h2>
+                <p class="text-gray-600 mb-4">Access your academic information and manage your profile</p>
+                <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                    <p class="text-blue-800">
+                        <strong>Your Role:</strong> <span th:text="${currentUserRole ?: 'STUDENT'}">STUDENT</span> | 
+                        <strong>Status:</strong> Active Student
+                    </p>
+                </div>
+            </div>
+
+            <!-- Student Features Grid -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-6">
+                
+                <!-- View Timetable Card -->
+                <div class="bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300">
+                    <div class="p-6">
+                        <div class="flex items-center justify-between mb-4">
+                            <h3 class="text-xl font-semibold text-gray-800">My Timetable</h3>
+                            <div class="bg-blue-100 p-3 rounded-full">
+                                <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                                </svg>
+                            </div>
+                        </div>
+                        <p class="text-gray-600 mb-4">View your class schedule and upcoming lessons</p>
+                        <a th:href="@{/timetables/student/view}" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded transition-colors duration-200 inline-block">
+                            View My Timetable
+                        </a>
+                    </div>
+                </div>
+
+                <!-- View Attendance Card -->
+                <div class="bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300">
+                    <div class="p-6">
+                        <div class="flex items-center justify-between mb-4">
+                            <h3 class="text-xl font-semibold text-gray-800">My Attendance</h3>
+                            <div class="bg-green-100 p-3 rounded-full">
+                                <svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                </svg>
+                            </div>
+                        </div>
+                        <p class="text-gray-600 mb-4">Check your attendance records and statistics</p>
+                        <a th:href="@{/attendances/list}" class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded transition-colors duration-200 inline-block">
+                            View Attendance
+                        </a>
+                    </div>
+                </div>
+
+                <!-- View Results Card -->
+                <div class="bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300">
+                    <div class="p-6">
+                        <div class="flex items-center justify-between mb-4">
+                            <h3 class="text-xl font-semibold text-gray-800">My Results</h3>
+                            <div class="bg-purple-100 p-3 rounded-full">
+                                <svg class="w-6 h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+                                </svg>
+                            </div>
+                        </div>
+                        <p class="text-gray-600 mb-4">View your exam results and academic progress</p>
+                        <a th:href="@{/student-results}" class="bg-purple-500 hover:bg-purple-600 text-white px-4 py-2 rounded transition-colors duration-200 inline-block">
+                            View Results
+                        </a>
+                    </div>
+                </div>
+
+                <!-- View Exams Card -->
+                <div class="bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300">
+                    <div class="p-6">
+                        <div class="flex items-center justify-between mb-4">
+                            <h3 class="text-xl font-semibold text-gray-800">Upcoming Exams</h3>
+                            <div class="bg-orange-100 p-3 rounded-full">
+                                <svg class="w-6 h-6 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                                </svg>
+                            </div>
+                        </div>
+                        <p class="text-gray-600 mb-4">Check your upcoming exams and schedules</p>
+                        <a th:href="@{/exams/list}" class="bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 rounded transition-colors duration-200 inline-block">
+                            View Exams
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Materials Card -->
+                <div class="bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300">
+                    <div class="p-6">
+                        <div class="flex items-center justify-between mb-4">
+                            <h3 class="text-xl font-semibold text-gray-800">Materials</h3>
+                            <div class="bg-green-100 p-3 rounded-full">
+                                <svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                                </svg>
+                            </div>
+                        </div>
+                        <p class="text-gray-600 mb-4">Download study materials and resources</p>
+                        <a th:href="@{/materials/list}" class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded transition-colors duration-200 inline-block">
+                            View Materials
+                        </a>
+                    </div>
+                </div>
+
+                <!-- My Profile Card -->
+                <div class="bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300">
+                    <div class="p-6">
+                        <div class="flex items-center justify-between mb-4">
+                            <h3 class="text-xl font-semibold text-gray-800">My Profile</h3>
+                            <div class="bg-indigo-100 p-3 rounded-full">
+                                <svg class="w-6 h-6 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
+                                </svg>
+                            </div>
+                        </div>
+                        <p class="text-gray-600 mb-4">View and manage your personal information</p>
+                        <a th:href="@{/users/profile}" class="bg-indigo-500 hover:bg-indigo-600 text-white px-4 py-2 rounded transition-colors duration-200 inline-block">
+                            Manage Profile
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Notifications Card -->
+                <div class="bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300">
+                    <div class="p-6">
+                        <div class="flex items-center justify-between mb-4">
+                            <h3 class="text-xl font-semibold text-gray-800">Notifications</h3>
+                            <div class="bg-yellow-100 p-3 rounded-full">
+                                <svg class="w-6 h-6 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-5 5v-5zm-8-5a3 3 0 106 0 3 3 0 00-6 0z"></path>
+                                </svg>
+                            </div>
+                        </div>
+                        <p class="text-gray-600 mb-4">Check your notifications and announcements</p>
+                        <a th:href="@{/notifications/list}" class="bg-yellow-500 hover:bg-yellow-600 text-white px-4 py-2 rounded transition-colors duration-200 inline-block">
+                            View Notifications
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Quick Stats Section -->
+            <div class="bg-white rounded-lg shadow-lg p-6">
+                <h3 class="text-2xl font-bold text-gray-800 mb-4">Quick Overview</h3>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div class="bg-blue-50 p-4 rounded-lg">
+                        <h4 class="font-semibold text-blue-800">Upcoming Exams</h4>
+                        <p class="text-2xl font-bold text-blue-600" th:text="${upcomingExams ?: 0}">0</p>
+                    </div>
+                    <div class="bg-green-50 p-4 rounded-lg">
+                        <h4 class="font-semibold text-green-800">Attendance Rate</h4>
+                        <p class="text-2xl font-bold text-green-600" th:text="${attendanceRate ?: '0%'}">0%</p>
+                    </div>
+                    <div class="bg-purple-50 p-4 rounded-lg">
+                        <h4 class="font-semibold text-purple-800">Last Notification</h4>
+                        <p class="text-sm font-medium text-purple-600" th:text="${lastNotification ?: 'No recent notifications'}" style="word-wrap: break-word;">No recent notifications</p>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <footer class="bg-blue-600 text-white p-4 text-center mt-8">
+        &copy; 2025 Learn Mate. All rights reserved.
+    </footer>
+</body>
+</html>

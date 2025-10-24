@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <title>Create Notification</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdn.jsdelivr.net/npm/heroicons@2.0.18/outline.css" rel="stylesheet">
+    <link th:href="@{/css/main.css}" rel="stylesheet">
+</head>
+<body class="bg-gray-100 font-sans">
+    <header class="bg-blue-600 text-white p-4 flex justify-between items-center shadow-md">
+        <h1 class="text-2xl font-bold">Learn Mate</h1>
+        <nav>
+            <a th:href="@{/dashboard}" class="mx-2 hover:underline">Dashboard</a>
+            <a th:href="@{/logout}" class="mx-2 hover:underline">Logout</a>
+        </nav>
+    </header>
+    <div class="flex">
+        <div th:replace="~{fragments/sidebar :: modern-sidebar('notifications')}"></div>
+        <main class="flex-1 p-6">
+            <div class="bg-white p-6 rounded-lg shadow-md">
+                <div class="flex items-center justify-between mb-6">
+                    <div>
+                        <h2 class="text-2xl font-bold text-blue-600">Create Notification</h2>
+                        <p class="text-gray-500">Send an update to a specific role or class</p>
+                    </div>
+                    <a th:href="@{/notifications/list}" class="inline-flex items-center text-blue-600 hover:text-blue-800">
+                        &larr; Back to Notifications
+                    </a>
+                </div>
+
+                <div th:if="${success}" class="mb-4 rounded border border-green-200 bg-green-50 px-4 py-3 text-green-700" th:text="${success}"></div>
+                <div th:if="${error}" class="mb-4 rounded border border-red-200 bg-red-50 px-4 py-3 text-red-700" th:text="${error}"></div>
+
+                <form th:action="@{/notifications/create}" method="post" enctype="multipart/form-data" class="space-y-5">
+                    <th:block th:if="${_csrf != null}">
+                        <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
+                    </th:block>
+                    <div>
+                        <label class="mb-1 block text-sm font-medium text-gray-700">Title</label>
+                        <input type="text" name="title" class="w-full rounded border border-gray-300 px-3 py-2 focus:border-blue-500 focus:outline-none" th:value="${prefillTitle}" required>
+                    </div>
+
+                    <div>
+                        <label class="mb-1 block text-sm font-medium text-gray-700">Message</label>
+                        <textarea name="message" class="w-full rounded border border-gray-300 px-3 py-2 focus:border-blue-500 focus:outline-none" rows="5" th:text="${prefillMessage}" required></textarea>
+                    </div>
+
+                    <div>
+                        <label class="mb-1 block text-sm font-medium text-gray-700">Attach File (Optional)</label>
+                        <input type="file" name="file" accept=".pdf,.doc,.docx,.txt,.jpg,.jpeg,.png,.xlsx,.xls" class="w-full rounded border border-gray-300 px-3 py-2 focus:border-blue-500 focus:outline-none">
+                        <p class="mt-1 text-sm text-gray-600">Supported formats: PDF, DOC, DOCX, TXT, JPG, JPEG, PNG, XLSX, XLS (Max 10MB)</p>
+                    </div>
+
+                    <div>
+                        <label class="mb-2 block text-sm font-medium text-gray-700">Target Roles</label>
+                        <div class="flex flex-wrap gap-3">
+                            <label th:each="role : ${roles}" class="flex items-center gap-2 rounded border border-gray-300 px-3 py-2 shadow-sm">
+                                <input type="checkbox" name="targetRoles" th:value="${role.name()}" onchange="toggleClassSelection()"
+                                       th:checked="${prefillRoles != null and #lists.contains(prefillRoles, role.name())}">
+                                <span th:text="${role.name()}">Role</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div id="classSelection" class="hidden">
+                        <label class="mb-2 block text-sm font-medium text-gray-700">Select Classes (Required when targeting students)</label>
+                        <div class="mb-3">
+                            <label class="flex items-center gap-2 rounded border border-blue-300 px-3 py-2 shadow-sm bg-blue-50">
+                                <input type="checkbox" id="selectAllClasses" onchange="toggleAllClasses()">
+                                <span class="font-medium text-blue-700">📋 Select All Classes</span>
+                            </label>
+                        </div>
+                        <div class="grid grid-cols-2 gap-3">
+                            <label th:each="schoolClass : ${schoolClasses}" class="flex items-center gap-2 rounded border border-gray-300 px-3 py-2 shadow-sm">
+                                <input type="checkbox" name="selectedClasses" class="class-checkbox" th:value="${schoolClass.id}"
+                                       th:checked="${prefillSelectedClasses != null and #lists.contains(prefillSelectedClasses, schoolClass.id)}">
+                                <span th:text="${schoolClass.name}">Class</span>
+                            </label>
+                        </div>
+                        <p class="mt-2 text-sm text-gray-600">Select the classes you want to target. Only students enrolled in these classes will receive the notification.</p>
+                    </div>
+
+                    <div id="subjectSelection" class="hidden">
+                        <label class="mb-2 block text-sm font-medium text-gray-700">Select Subjects (Required when targeting students)</label>
+                        <div class="mb-3">
+                            <label class="flex items-center gap-2 rounded border border-green-300 px-3 py-2 shadow-sm bg-green-50">
+                                <input type="checkbox" id="selectAllSubjects" onchange="toggleAllSubjects()">
+                                <span class="font-medium text-green-700">📚 Select All Subjects</span>
+                            </label>
+                        </div>
+                        <div class="grid grid-cols-2 gap-3">
+                            <label th:each="subject : ${teacherSubjects}" class="flex items-center gap-2 rounded border border-gray-300 px-3 py-2 shadow-sm">
+                                <input type="checkbox" name="selectedSubjects" class="subject-checkbox" th:value="${subject.id}"
+                                       th:checked="${prefillSelectedSubjects != null and #lists.contains(prefillSelectedSubjects, subject.id)}">
+                                <span th:text="${subject.name}">Subject</span>
+                            </label>
+                        </div>
+                        <p class="mt-2 text-sm text-gray-600">Select the subjects you teach. Only students enrolled in these subjects will receive the notification.</p>
+                    </div>
+
+                    <div class="flex justify-end space-x-3">
+                        <a th:href="@{/notifications/list}" class="rounded border border-gray-300 px-4 py-2 text-gray-600 hover:bg-gray-100">Cancel</a>
+                        <button type="submit" class="rounded bg-blue-600 px-4 py-2 font-semibold text-white hover:bg-blue-700">Send Notification</button>
+                    </div>
+                </form>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        function toggleClassSelection() {
+            const studentCheckbox = document.querySelector('input[name="targetRoles"][value="STUDENT"]');
+            const classSelection = document.getElementById('classSelection');
+            const subjectSelection = document.getElementById('subjectSelection');
+            
+            if (studentCheckbox && studentCheckbox.checked) {
+                classSelection.classList.remove('hidden');
+                subjectSelection.classList.remove('hidden');
+            } else {
+                classSelection.classList.add('hidden');
+                subjectSelection.classList.add('hidden');
+                // Uncheck all class and subject selections when student is not selected
+                document.querySelectorAll('input[name="selectedClasses"]').forEach(checkbox => {
+                    checkbox.checked = false;
+                });
+                document.querySelectorAll('input[name="selectedSubjects"]').forEach(checkbox => {
+                    checkbox.checked = false;
+                });
+                // Uncheck select all checkboxes
+                document.getElementById('selectAllClasses').checked = false;
+                document.getElementById('selectAllSubjects').checked = false;
+            }
+        }
+
+        function toggleAllClasses() {
+            const selectAllCheckbox = document.getElementById('selectAllClasses');
+            const classCheckboxes = document.querySelectorAll('.class-checkbox');
+            
+            classCheckboxes.forEach(checkbox => {
+                checkbox.checked = selectAllCheckbox.checked;
+            });
+        }
+
+        function toggleAllSubjects() {
+            const selectAllCheckbox = document.getElementById('selectAllSubjects');
+            const subjectCheckboxes = document.querySelectorAll('.subject-checkbox');
+            
+            subjectCheckboxes.forEach(checkbox => {
+                checkbox.checked = selectAllCheckbox.checked;
+            });
+        }
+
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            toggleClassSelection();
+            
+            // Update select all checkboxes when individual checkboxes change
+            document.querySelectorAll('.class-checkbox').forEach(checkbox => {
+                checkbox.addEventListener('change', function() {
+                    const classCheckboxes = document.querySelectorAll('.class-checkbox');
+                    const checkedClassCheckboxes = document.querySelectorAll('.class-checkbox:checked');
+                    const selectAllClasses = document.getElementById('selectAllClasses');
+                    
+                    if (checkedClassCheckboxes.length === classCheckboxes.length) {
+                        selectAllClasses.checked = true;
+                        selectAllClasses.indeterminate = false;
+                    } else if (checkedClassCheckboxes.length === 0) {
+                        selectAllClasses.checked = false;
+                        selectAllClasses.indeterminate = false;
+                    } else {
+                        selectAllClasses.checked = false;
+                        selectAllClasses.indeterminate = true;
+                    }
+                });
+            });
+
+            document.querySelectorAll('.subject-checkbox').forEach(checkbox => {
+                checkbox.addEventListener('change', function() {
+                    const subjectCheckboxes = document.querySelectorAll('.subject-checkbox');
+                    const checkedSubjectCheckboxes = document.querySelectorAll('.subject-checkbox:checked');
+                    const selectAllSubjects = document.getElementById('selectAllSubjects');
+                    
+                    if (checkedSubjectCheckboxes.length === subjectCheckboxes.length) {
+                        selectAllSubjects.checked = true;
+                        selectAllSubjects.indeterminate = false;
+                    } else if (checkedSubjectCheckboxes.length === 0) {
+                        selectAllSubjects.checked = false;
+                        selectAllSubjects.indeterminate = false;
+                    } else {
+                        selectAllSubjects.checked = false;
+                        selectAllSubjects.indeterminate = true;
+                    }
+                });
+            });
+        });
+    </script>
+
+</body>
+</html>

@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+      th:replace="~{layout :: layout(~{::content}, 'Bulk Mark Entry')}">
+    <div th:fragment="content">
+        <div class="mb-6">
+            <nav class="flex items-center space-x-2 text-sm text-gray-500 mb-4">
+                <a href="/marks/bulk" class="hover:text-blue-600">Select Class & Exam</a>
+                <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"></path></svg>
+                <span class="text-gray-900">Enter Marks</span>
+            </nav>
+            
+            <div class="flex items-center justify-between">
+                <div>
+                    <h2 class="text-2xl font-bold text-blue-600">
+                        Bulk Mark Entry - <span th:text="${schoolClass.name}">Class Name</span>
+                    </h2>
+                    <p class="text-gray-600 mt-1">
+                        <span class="font-medium" th:text="${exam.subject.name}">Subject</span>
+                        <span class="mx-2">•</span>
+                        <span th:text="${exam.grade}">Grade</span>
+                        <span class="mx-2">•</span>
+                        <span th:text="${#temporals.format(exam.date, 'MMMM d, yyyy')}">Exam Date</span>
+                        <span class="mx-2">•</span>
+                        <span th:text="${#lists.size(students)} + ' students'">Student count</span>
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Warning for existing marks -->
+        <div th:if="${!#lists.isEmpty(existingMarks)}" class="mb-6 p-4 bg-yellow-100 border border-yellow-400 text-yellow-700 rounded-lg">
+            <div class="flex items-center">
+                <svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"></path>
+                </svg>
+                <span>Marks have already been entered for this exam and class. Submitting this form will overwrite the existing marks.</span>
+            </div>
+        </div>
+
+        <div class="bg-white rounded-lg shadow-md">
+            <form th:action="@{/marks/bulk/{classId}/exam/{examId}(classId=${schoolClass.id}, examId=${exam.id})}" method="post" onsubmit="return confirmSubmission()">
+                <div class="p-6">
+                    <div th:if="${#lists.isEmpty(students)}" class="text-center py-8">
+                        <div class="text-gray-500">
+                            <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v3m0 0v3m0-3h3m-3 0H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                            <h3 class="mt-2 text-sm font-medium text-gray-900">No Students in Class</h3>
+                            <p class="mt-1 text-sm text-gray-500">This class doesn't have any students enrolled yet.</p>
+                        </div>
+                    </div>
+
+                    <!-- Student Marks Entry -->
+                    <div th:unless="${#lists.isEmpty(students)}">
+                        <div class="mb-4 flex justify-between items-center">
+                            <h3 class="text-lg font-medium text-gray-900">Student Marks</h3>
+                            <div class="flex space-x-2">
+                                <button type="button" onclick="clearAllMarks()" class="bg-gray-500 text-white py-1 px-3 rounded hover:bg-gray-600 transition duration-200 text-sm">
+                                    Clear All
+                                </button>
+                                <button type="button" onclick="setPassMark()" th:data-pass-mark="${exam.passMark ?: 50}" class="bg-yellow-500 text-white py-1 px-3 rounded hover:bg-yellow-600 transition duration-200 text-sm">
+                                    Set Pass Mark (<span th:text="${exam.passMark ?: 50}">50</span>)
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                            <div th:each="student : ${students}" class="border border-gray-200 rounded-lg p-4">
+                                <div class="flex items-center justify-between mb-3">
+                                    <div>
+                                        <h4 class="font-medium text-gray-900" th:text="${student.fullName}">Student Name</h4>
+                                        <p class="text-sm text-gray-600" th:text="${student.username}">student.id</p>
+                                    </div>
+                                </div>
+                                
+                                <div>
+                                    <label th:for="'score_' + ${student.id}" class="block text-sm font-medium text-gray-700 mb-1">Score (0-100)</label>
+                                    <input type="number" 
+                                           th:id="'score_' + ${student.id}"
+                                           th:name="'score_' + ${student.id}"
+                                           min="0" max="100" 
+                                           placeholder="Enter score"
+                                           th:value="${existingMarks.?[student.id == #this.student.id].![score].get(0)}"
+                                           class="w-full border border-gray-300 p-2 rounded focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mt-6 flex justify-center space-x-4">
+                            <a href="/marks/bulk" class="bg-gray-500 text-white py-2 px-6 rounded-lg hover:bg-gray-600 transition duration-200">
+                                Back to Selection
+                            </a>
+                            <button type="submit" class="bg-green-500 text-white py-2 px-6 rounded-lg hover:bg-green-600 transition duration-200 font-medium">
+                                Save All Marks
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+
+        <script>
+        function confirmSubmission() {
+            const filledInputs = document.querySelectorAll('input[type="number"][value]:not([value=""])').length;
+            const totalInputs = document.querySelectorAll('input[type="number"]').length;
+            
+            if (filledInputs === 0) {
+                alert('Please enter at least one mark before submitting.');
+                return false;
+            }
+            
+            return confirm(`You are about to save marks for ${filledInputs} out of ${totalInputs} students. Continue?`);
+        }
+
+        function clearAllMarks() {
+            if (confirm('Are you sure you want to clear all marks?')) {
+                document.querySelectorAll('input[type="number"]').forEach(input => {
+                    input.value = '';
+                });
+            }
+        }
+
+        function setPassMark() {
+            const passMarkButton = document.querySelector('[data-pass-mark]');
+            const passMark = passMarkButton.dataset.passMark || '50';
+            
+            if (confirm(`Set all empty fields to pass mark (${passMark})?`)) {
+                document.querySelectorAll('input[type="number"]').forEach(input => {
+                    if (!input.value) {
+                        input.value = passMark;
+                    }
+                });
+            }
+        }
+        </script>
+    </div>
+</html>

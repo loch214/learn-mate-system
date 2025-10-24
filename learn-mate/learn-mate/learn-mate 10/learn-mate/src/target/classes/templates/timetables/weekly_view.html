@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+      th:replace="~{layout :: layout(~{::content}, 'Weekly timetable')}">
+<div th:fragment="content">
+    <section class="surface-card">
+        <div class="toolbar">
+            <div>
+                <h1 class="page-title" th:if="${isStudentView}"><span class="icon">📅</span>My weekly timetable</h1>
+                <h1 class="page-title" th:if="${isTeacherView}"><span class="icon">🧑‍🏫</span>Teaching schedule</h1>
+                <h1 class="page-title" th:if="${isAdminView}"><span class="icon">🗂️</span>All timetables</h1>
+                <p class="helper-text" th:if="${isStudentView}" style="margin:0;">
+                    Staying organised for <strong th:text="${studentClass}">Class</strong>. Your enrolled subjects: 
+                    <span th:if="${studentSubjects != null and !studentSubjects.empty}" th:each="subject, iter : ${studentSubjects}">
+                        <span th:text="${subject.name}"></span><span th:if="${!iter.last}">, </span>
+                    </span>
+                    <span th:if="${studentSubjects == null or studentSubjects.empty}">pending assignment.</span>
+                </p>
+                <p class="helper-text" th:if="${isTeacherView}" style="margin:0;">Pick a class to curate its sessions and keep every learner aligned.</p>
+                <p class="helper-text" th:if="${isAdminView}" style="margin:0;">Review every timetable entry on a single canvas.</p>
+            </div>
+            <div th:if="${isTeacherView or isAdminView}">
+                <a th:href="@{/timetables/list}" class="btn btn-secondary">Timetable library</a>
+            </div>
+        </div>
+
+        <div th:if="${isTeacherView}" class="filter-panel">
+            <form th:action="@{/timetables/weekly}" method="get" class="filter-form">
+                <div class="form-group">
+                    <label for="classId">Class</label>
+                    <select name="classId" id="classId">
+                        <option value="">Select a class</option>
+                        <option th:each="schoolClass : ${schoolClasses}" th:value="${schoolClass.id}" th:text="${schoolClass.name}"
+                                th:selected="${selectedClassId != null and selectedClassId == schoolClass.id}">Class</option>
+                    </select>
+                </div>
+                <button type="submit" class="btn btn-primary">View timetable</button>
+            </form>
+            <div th:if="${selectedClass != null}" class="filter-meta">
+                <span class="pill accent-student">Currently viewing: <strong th:text="${selectedClass.name}">Class A</strong></span>
+            </div>
+        </div>
+
+        <div th:if="${error}" class="alert alert-error" style="margin-top:1.5rem;">
+            <span th:text="${error}"></span>
+        </div>
+
+        <div th:if="${success}" class="alert alert-success" style="margin-top:1.5rem;">
+            <span th:text="${success}"></span>
+        </div>
+
+        <div th:if="${info}" class="alert alert-info" style="margin-top:1.5rem;">
+            <span th:text="${info}"></span>
+        </div>
+
+        <div th:if="${timetables != null and !timetables.empty}" class="timetable-summary">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M21 6h-4V4a2 2 0 00-2-2h-6a2 2 0 00-2 2v2H3" />
+                <path d="M5 10h14" />
+                <path d="M5 6v14a2 2 0 002 2h10a2 2 0 002-2V6" />
+            </svg>
+            <span th:if="${isStudentView}"><strong th:text="${timetables.size()}">0</strong> classes scheduled for your grade this week.</span>
+            <span th:if="${isTeacherView}"><strong th:text="${timetables.size()}">0</strong> teaching sessions lined up this week.</span>
+            <span th:if="${isAdminView}"><strong th:text="${timetables.size()}">0</strong> total timetable entries in the system.</span>
+        </div>
+
+        <div th:if="${timetables != null and !timetables.empty}" class="table-wrapper" style="margin-top:1.5rem;">
+            <table class="timetable-table">
+                <thead>
+                <tr>
+                    <th>Time</th>
+                    <th th:each="day : ${days}" th:text="${#strings.capitalize(day.toLowerCase())}">Monday</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="slot : ${timeSlots}">
+                    <td th:text="${slot}">08:00 - 09:00</td>
+                    <td th:each="day : ${days}" th:with="items=${grid[day + '|' + slot]}">
+                        <div th:if="${items != null}" class="slot-stack">
+                            <article th:each="t : ${items}" class="slot-card">
+                                <header>
+                                    <span class="slot-subject" th:text="${t.subject != null ? t.subject.name : t.title}">Subject</span>
+                                    <span class="slot-room" th:text="${t.room != null ? 'Room ' + t.room : 'Room TBA'}">Room</span>
+                                </header>
+                                <dl>
+                                    <div th:if="${t.teacher != null}">
+                                        <dt>Teacher</dt>
+                                        <dd th:text="${t.teacher.name}">Sarah Johnson</dd>
+                                    </div>
+                                    <div th:if="${t.schoolClass != null}">
+                                        <dt>Class</dt>
+                                        <dd th:text="${t.schoolClass.name}">Grade 11</dd>
+                                    </div>
+                                </dl>
+                                <div th:if="${isTeacherView or isAdminView}" class="slot-actions">
+                                    <a th:href="@{/timetables/edit/{id}(id=${t.id}, classId=${selectedClassId})}" class="action-icon action-icon--edit" title="Edit entry">
+                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                            <path d="M12 20h9" />
+                                            <path d="M16.5 3.5a2.121 2.121 0 013 3L7 19l-4 1 1-4 12.5-12.5z" />
+                                        </svg>
+                                    </a>
+                                    <form th:action="@{/timetables/delete/{id}(id=${t.id})}" method="post" onsubmit="return confirm('Delete this timetable entry?');" style="display: inline;">
+                                        <input type="hidden" name="classId" th:value="${selectedClassId}">
+                                        <button type="submit" class="action-icon action-icon--delete" title="Delete entry">
+                                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                                <polyline points="3 6 5 6 21 6" />
+                                                <path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6" />
+                                                <path d="M10 11v6" />
+                                                <path d="M14 11v6" />
+                                                <path d="M9 6V4a1 1 0 011-1h4a1 1 0 011 1v2" />
+                                            </svg>
+                                        </button>
+                                    </form>
+                                </div>
+                            </article>
+                        </div>
+                        <div th:if="${items == null and (isTeacherView or isAdminView) and selectedClassId != null}" class="slot-empty">
+                            <a th:href="@{/timetables/create(classId=${selectedClassId}, day=${day}, timeSlot=${slot})}" class="btn btn-text">Add session</a>
+                        </div>
+                        <div th:if="${items == null and !(isTeacherView or isAdminView)}" class="slot-empty muted">
+                            <span class="helper-text">No session</span>
+                        </div>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div th:if="${timetables == null or timetables.empty}" class="empty-state">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M8 7V3m8 4V3m-9 8h10" />
+                <rect x="3" y="5" width="18" height="16" rx="2" ry="2" />
+            </svg>
+            <h2 th:if="${isStudentView}">No timetable yet</h2>
+            <h2 th:if="${isTeacherView}">No teaching sessions</h2>
+            <h2 th:if="${isAdminView}">No timetables recorded</h2>
+            <p th:if="${isStudentView}">Once your school sets up the schedule it will appear here automatically.</p>
+            <p th:if="${isTeacherView}">Assign yourself to a class to start shaping the week.</p>
+            <p th:if="${isAdminView}">Create a timetable to kick things off.</p>
+            <div th:if="${isAdminView or isTeacherView}" class="empty-state-actions">
+                <a th:href="@{/timetables/create}" class="btn btn-primary">Create timetable</a>
+                <a th:if="${isTeacherView}" th:href="@{/classes/list}" class="btn btn-secondary">Browse classes</a>
+            </div>
+        </div>
+
+        <div class="page-actions">
+            <a th:href="@{/dashboard}" class="btn btn-secondary">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="15 18 9 12 15 6" />
+                </svg>
+                Back to dashboard
+            </a>
+        </div>
+    </section>
+</div>
+</html>

@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Learn Mate - Login</title>
+    <link th:href="@{/css/main.css}" rel="stylesheet">
+</head>
+<body class="auth-page login-page">
+<div class="auth-card">
+    <header>
+        <h1 class="page-title" style="justify-content:center;"><span class="icon">🔐</span>Welcome back</h1>
+        <p>Sign in to access your personalised Learn Mate dashboard.</p>
+    </header>
+    <form th:action="@{/login}" method="post">
+        <div class="form-group">
+            <label for="username">Username</label>
+            <input type="text" id="username" name="username" placeholder="Enter your username">
+        </div>
+        <div class="form-group">
+            <label for="password">Password</label>
+            <input type="password" id="password" name="password" placeholder="Enter your password">
+        </div>
+        <div class="form-group form-check">
+            <label for="remember-me">
+                <input id="remember-me" name="remember-me" type="checkbox">
+                <span>Remember me</span>
+            </label>
+        </div>
+        <button type="submit" class="btn btn-primary" style="width:100%;">Log in</button>
+    </form>
+    <p th:if="${param.error}" class="error-message" style="text-align:center;">Invalid username or password.</p>
+    <p th:if="${param.logout}" class="success-message" style="text-align:center;">You have been logged out.</p>
+    <p th:if="${param.registered}" class="success-message" style="text-align:center;">Registration successful! Please log in.</p>
+    <div class="login-meta">
+        <span>Need an account?</span>
+        <a th:href="@{/users/register}" class="btn btn-text">Create one</a>
+    </div>
+</div>
+</body>
+</html>

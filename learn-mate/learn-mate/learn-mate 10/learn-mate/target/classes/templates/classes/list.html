@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+      th:replace="~{layout :: layout(~{::content}, 'Classes Management')}">
+    <div th:fragment="content">
+        <div class="surface-card">
+            <div class="flex justify-between items-center mb-6">
+                <div>
+                    <h2 class="page-title"><span class="icon">🏫</span>Classes Management</h2>
+                    <p class="text-gray-600">Manage all classes and their assignments</p>
+                </div>
+                <div sec:authorize="hasRole('ADMIN')">
+                    <a th:href="@{/classes/create}"
+                       class="btn btn-primary">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+                        </svg>
+                        Create New Class
+                    </a>
+                </div>
+            </div>
+                
+                <div class="overflow-x-auto">
+                    <table class="w-full border-collapse bg-white shadow-sm rounded-lg overflow-hidden">
+                        <thead>
+                            <tr class="bg-blue-50 border-b border-blue-100">
+                                <th class="p-4 text-left font-semibold text-blue-900">ID</th>
+                                <th class="p-4 text-left font-semibold text-blue-900">Class Name</th>
+                                <th class="p-4 text-left font-semibold text-blue-900">Teacher</th>
+                                <th class="p-4 text-left font-semibold text-blue-900">Subject</th>
+                                <th class="p-4 text-left font-semibold text-blue-900">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:each="class : ${classes}" class="border-b border-gray-100 hover:bg-gray-50 transition">
+                                <td class="p-4" th:text="${class.id}">1</td>
+                                <td class="p-4">
+                                    <div class="font-medium text-gray-900" th:text="${class.name}">Grade 10A</div>
+                                </td>
+                                <td class="p-4">
+                                    <div class="text-gray-700" th:text="${class.teacher.name}">John Doe</div>
+                                </td>
+                                <td class="p-4">
+                                    <span class="bg-blue-100 text-blue-800 px-2 py-1 rounded-full text-xs font-semibold" 
+                                          th:text="${class.subject.name}">Mathematics</span>
+                                </td>
+                                <td class="p-4">
+                                    <div class="flex gap-2">
+                                        <a th:href="@{/classes/edit/{id}(id=${class.id})}" 
+                                           class="bg-yellow-500 text-white px-3 py-2 rounded-md text-sm hover:bg-yellow-600 focus:ring-2 focus:ring-yellow-500 focus:ring-offset-1 transition-colors duration-200 font-medium inline-flex items-center">
+                                            <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+                                            </svg>
+                                            Edit
+                                        </a>
+                                        <a th:href="@{/classes/delete/{id}(id=${class.id})}" 
+                                           class="bg-red-600 text-white px-3 py-2 rounded-md text-sm hover:bg-red-700 focus:ring-2 focus:ring-red-500 focus:ring-offset-1 transition-colors duration-200 font-medium inline-flex items-center"
+                                           onclick="return confirm('Are you sure you want to delete this class?')">
+                                            <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                                            </svg>
+                                            Delete
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr th:if="${#lists.isEmpty(classes)}">
+                                <td colspan="5" class="p-8 text-center text-gray-500">
+                                    No classes found. <a th:href="@{/classes/create}" class="text-blue-500 hover:underline">Create the first class</a>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</html>
