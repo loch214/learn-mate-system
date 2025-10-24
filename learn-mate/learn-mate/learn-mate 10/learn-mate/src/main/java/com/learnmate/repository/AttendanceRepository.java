@@ -32,16 +32,26 @@ public interface AttendanceRepository extends JpaRepository<Attendance, Long> {
     // New methods for enhanced attendance tracking
     List<Attendance> findByTeacher(User teacher);
     
-    @Query("SELECT a FROM Attendance a WHERE a.schoolClass = :schoolClass AND a.subject = :subject AND a.date = :date")
-    List<Attendance> findBySchoolClassAndSubjectAndDate(@Param("schoolClass") SchoolClass schoolClass, 
-                                                       @Param("subject") Subject subject, 
-                                                       @Param("date") LocalDate date);
-    
-    @Modifying
-    @Query("DELETE FROM Attendance a WHERE a.schoolClass = :schoolClass AND a.subject = :subject AND a.date = :date")
-    void deleteBySchoolClassAndSubjectAndDate(@Param("schoolClass") SchoolClass schoolClass, 
-                                             @Param("subject") Subject subject, 
-                                             @Param("date") LocalDate date);
+        @Query("""
+                SELECT a FROM Attendance a
+                WHERE a.schoolClass = :schoolClass
+                    AND ((:subject IS NULL AND a.subject IS NULL) OR a.subject = :subject)
+                    AND a.date = :date
+        """)
+        List<Attendance> findBySchoolClassAndSubjectAndDate(@Param("schoolClass") SchoolClass schoolClass,
+                                                                                                                @Param("subject") Subject subject,
+                                                                                                                @Param("date") LocalDate date);
+
+        @Modifying(clearAutomatically = true)
+        @Query("""
+                DELETE FROM Attendance a
+                WHERE a.schoolClass = :schoolClass
+                    AND ((:subject IS NULL AND a.subject IS NULL) OR a.subject = :subject)
+                    AND a.date = :date
+        """)
+        void deleteBySchoolClassAndSubjectAndDate(@Param("schoolClass") SchoolClass schoolClass,
+                                                                                            @Param("subject") Subject subject,
+                                                                                            @Param("date") LocalDate date);
 
     List<Attendance> findBySchoolClassIn(Collection<SchoolClass> schoolClasses);
 }
