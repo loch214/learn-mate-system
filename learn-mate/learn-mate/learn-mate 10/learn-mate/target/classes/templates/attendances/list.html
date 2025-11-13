@@ -129,6 +129,7 @@
                                         Includes attendance from multiple classes - filter by class to narrow results.
                                     </p>
                                     <p class="text-sm text-gray-500" th:if="${selectedDate}" th:text="${'Filtered by date ' + selectedDate}">Filtered info</p>
+                                    <p class="text-sm text-purple-500" th:if="${selectedSubjectName}" th:text="${'Filtered by subject ' + selectedSubjectName}">Filtered subject info</p>
                                 </div>
                                 <a sec:authorize="hasRole('TEACHER')" th:if="${clazz != null}" th:href="@{/attendances/mark/{id}(id=${clazz.id})}"
                                    class="inline-flex items-center gap-2 rounded-md border border-green-200 bg-green-50 px-4 py-2 text-sm font-semibold text-green-700 hover:bg-green-100">

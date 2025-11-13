@@ -208,9 +208,16 @@ public class AttendanceController extends BaseController {
                 return "attendances/list";
             }
 
-            List<Attendance> filtered = baseAttendances.stream()
-                .filter(attendance -> attendance.getSchoolClass() != null && Objects.equals(attendance.getSchoolClass().getId(), classId))
-                .toList();
+            SchoolClass selectedClass = schoolClassService.getSchoolClassById(classId)
+                .orElse(null);
+
+            if (selectedClass == null) {
+                model.addAttribute("error", "The selected class could not be found.");
+                populateAttendanceModel(model, user, baseAttendances, classOptions, null, null);
+                return "attendances/list";
+            }
+
+            List<Attendance> filtered = attendanceService.getClassHistory(selectedClass);
 
             if (filtered.isEmpty()) {
                 model.addAttribute("info", "No attendance records found for the selected class.");
@@ -228,6 +235,7 @@ public class AttendanceController extends BaseController {
     @PreAuthorize("hasAnyRole('TEACHER', 'ADMIN')")
     public String viewClassHistory(@PathVariable Long classId,
                                    @RequestParam(value = "date", required = false) String date,
+                                   @RequestParam(value = "subjectId", required = false) Long subjectId,
                                    Model model,
                                    @AuthenticationPrincipal UserDetails userDetails) {
         try {
@@ -263,7 +271,28 @@ public class AttendanceController extends BaseController {
             }
             final LocalDate selectedDate = parsedDate;
 
-            List<Attendance> attendances = attendanceService.getAttendancesForClasses(List.of(selectedClass));
+            Subject subjectFilter = null;
+            if (subjectId != null) {
+                subjectFilter = subjectService.getSubjectById(subjectId).orElse(null);
+                if (subjectFilter == null) {
+                    model.addAttribute("info", "Selected subject could not be found. Showing all subjects for this class.");
+                }
+            }
+
+            List<Attendance> attendances = attendanceService.getClassHistory(selectedClass);
+
+            if (subjectFilter != null) {
+                final Long subjectFilterId = subjectFilter.getId();
+                attendances = attendances.stream()
+                    .filter(attendance -> {
+                        if (attendance.getSubject() == null) {
+                            return subjectFilterId == null;
+                        }
+                        return Objects.equals(attendance.getSubject().getId(), subjectFilterId);
+                    })
+                    .toList();
+            }
+
             if (selectedDate != null) {
                 attendances = attendances.stream()
                     .filter(attendance -> selectedDate.equals(attendance.getDate()))
@@ -272,13 +301,21 @@ public class AttendanceController extends BaseController {
 
             populateAttendanceModel(model, user, attendances, classOptions, selectedClass.getId(), selectedDate);
 
+            if (subjectFilter != null) {
+                model.addAttribute("selectedSubjectId", subjectFilter.getId());
+                model.addAttribute("selectedSubjectName", subjectFilter.getName());
+            }
+
             if (attendances.isEmpty()) {
                 StringBuilder infoMessage = new StringBuilder("No attendance records found for ")
                     .append(selectedClass.getName() != null ? selectedClass.getName() : "this class");
                 if (selectedDate != null) {
                     infoMessage.append(" on ").append(selectedDate);
                 }
-                infoMessage.append('.') ;
+                if (subjectFilter != null) {
+                    infoMessage.append(" for subject ").append(subjectFilter.getName());
+                }
+                infoMessage.append('.');
                 model.addAttribute("info", infoMessage.toString());
             }
 

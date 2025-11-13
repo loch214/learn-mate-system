@@ -18,7 +18,6 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 @Service
 public class AttendanceService {
@@ -94,52 +93,32 @@ public class AttendanceService {
             return List.of();
         }
 
-        Set<Long> classIds = classes.stream()
-            .filter(Objects::nonNull)
-            .map(SchoolClass::getId)
-            .filter(Objects::nonNull)
-            .collect(Collectors.toCollection(LinkedHashSet::new));
+        Set<Long> seenIds = new LinkedHashSet<>();
+        List<Attendance> combined = new ArrayList<>();
 
-        if (classIds.isEmpty()) {
+        for (SchoolClass schoolClass : classes) {
+            if (schoolClass == null || schoolClass.getId() == null) {
+                continue;
+            }
+
+            List<Attendance> classHistory = getClassHistory(schoolClass);
+            for (Attendance attendance : classHistory) {
+                Long attendanceId = attendance.getId();
+                if (attendanceId == null || seenIds.add(attendanceId)) {
+                    combined.add(attendance);
+                }
+            }
+        }
+
+        return combined;
+    }
+
+    public List<Attendance> getClassHistory(SchoolClass schoolClass) {
+        if (schoolClass == null || schoolClass.getId() == null) {
             return List.of();
         }
 
-        List<SchoolClass> sanitizedClasses = classes.stream()
-            .filter(Objects::nonNull)
-            .filter(clazz -> clazz.getId() != null)
-            .distinct()
-            .toList();
-
-        List<Attendance> directMatches = sanitizedClasses.isEmpty()
-            ? List.of()
-            : attendanceRepository.findBySchoolClassIn(sanitizedClasses);
-
-        Set<Long> seenAttendanceIds = directMatches.stream()
-            .map(Attendance::getId)
-            .filter(Objects::nonNull)
-            .collect(Collectors.toSet());
-
-        List<Attendance> viaStudentClass = attendanceRepository.findAll().stream()
-            .filter(attendance -> attendance.getStudent() != null && attendance.getStudent().getSchoolClass() != null)
-            .filter(attendance -> {
-                SchoolClass studentClass = attendance.getStudent().getSchoolClass();
-                Long classId = studentClass.getId();
-                return classId != null && classIds.contains(classId);
-            })
-            .filter(attendance -> {
-                Long attendanceId = attendance.getId();
-                return attendanceId == null || !seenAttendanceIds.contains(attendanceId);
-            })
-            .collect(Collectors.toList());
-
-        if (viaStudentClass.isEmpty()) {
-            return directMatches;
-        }
-
-        List<Attendance> combined = new ArrayList<>(directMatches.size() + viaStudentClass.size());
-        combined.addAll(directMatches);
-        combined.addAll(viaStudentClass);
-        return combined;
+        return attendanceRepository.findClassHistory(schoolClass);
     }
 
     @Transactional

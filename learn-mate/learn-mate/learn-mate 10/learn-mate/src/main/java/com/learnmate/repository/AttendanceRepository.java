@@ -54,4 +54,13 @@ public interface AttendanceRepository extends JpaRepository<Attendance, Long> {
                                                                                             @Param("date") LocalDate date);
 
     List<Attendance> findBySchoolClassIn(Collection<SchoolClass> schoolClasses);
+
+        @Query("""
+            SELECT a
+            FROM Attendance a
+            WHERE (a.schoolClass = :schoolClass)
+               OR (a.schoolClass IS NULL AND a.student IS NOT NULL AND a.student.schoolClass = :schoolClass)
+            ORDER BY a.date DESC, a.student.name ASC, a.id DESC
+        """)
+        List<Attendance> findClassHistory(@Param("schoolClass") SchoolClass schoolClass);
 }
