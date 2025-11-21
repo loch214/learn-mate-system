@@ -17,11 +17,14 @@ public class SecurityConfig {
     
     private final CustomAuthenticationSuccessHandler authenticationSuccessHandler;
     private final org.springframework.security.core.userdetails.UserDetailsService userDetailsService;
+    private final CustomAuthenticationFailureHandler authenticationFailureHandler;
 
     public SecurityConfig(CustomAuthenticationSuccessHandler authenticationSuccessHandler,
-                          org.springframework.security.core.userdetails.UserDetailsService userDetailsService) {
+                          org.springframework.security.core.userdetails.UserDetailsService userDetailsService,
+                          CustomAuthenticationFailureHandler authenticationFailureHandler) {
         this.authenticationSuccessHandler = authenticationSuccessHandler;
         this.userDetailsService = userDetailsService;
+        this.authenticationFailureHandler = authenticationFailureHandler;
     }
 
     @Bean
@@ -75,7 +78,7 @@ public class SecurityConfig {
                         .loginPage("/login")
                         .loginProcessingUrl("/login")
                         .successHandler(authenticationSuccessHandler)
-                        .failureUrl("/login?error=true")
+                        .failureHandler(authenticationFailureHandler)
                         .permitAll()
                 )
                 .rememberMe(remember -> remember

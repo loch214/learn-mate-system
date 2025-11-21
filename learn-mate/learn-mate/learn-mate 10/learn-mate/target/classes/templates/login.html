@@ -19,6 +19,17 @@
             <h1 class="page-title">Welcome back</h1>
             <p>Sign in to access your personalised Learn Mate dashboard.</p>
         </header>
+
+        <div th:if="${loginError != null or param.error != null or session.SPRING_SECURITY_LAST_EXCEPTION != null}"
+             class="alert alert-error" role="alert">
+            <div class="alert-content">
+                <strong>Authentication failed</strong>
+                <span th:text="${loginError != null ? loginError : 'Invalid username or password.'}">
+                    Invalid username or password.
+                </span>
+            </div>
+        </div>
+
         <form th:action="@{/login}" method="post">
             <div class="form-group">
                 <label for="username">Username</label>
@@ -36,9 +47,14 @@
             </div>
             <button type="submit" class="btn btn-primary" style="width:100%;">Log in</button>
         </form>
-        <p th:if="${param.error}" class="error-message" style="text-align:center;">Invalid username or password.</p>
-        <p th:if="${param.logout}" class="success-message" style="text-align:center;">You have been logged out.</p>
-        <p th:if="${param.registered}" class="success-message" style="text-align:center;">Registration successful! Please log in.</p>
+        <!-- Show error if redirected with ?error or if Spring Security placed an exception in session -->
+        <!-- Note: Thymeleaf requires a single expression wrapper for compound conditions -->
+        <div th:if="${param.logout}" class="alert alert-success" role="status">
+            You have been logged out.
+        </div>
+        <div th:if="${param.registered}" class="alert alert-success" role="status">
+            Registration successful! Please log in.
+        </div>
         <div class="login-meta">
             <span>Need an account?</span>
             <a th:href="@{/users/register}" class="btn btn-text">Create one</a>

@@ -1465,6 +1465,21 @@ form.filter-form {
     max-width: 28rem;
 }
 
+.auth-card .alert {
+    width: 100%;
+    margin-top: 1rem;
+}
+
+.auth-card .alert-content {
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+}
+
+.auth-card .alert-content strong {
+    font-size: 0.95rem;
+}
+
 .auth-form {
     background: transparent;
     padding: 0;
