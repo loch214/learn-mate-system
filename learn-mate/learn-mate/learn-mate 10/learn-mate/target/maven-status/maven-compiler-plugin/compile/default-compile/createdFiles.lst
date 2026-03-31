@@ -1,5 +1,7 @@
 com\learnmate\model\Attendance.class
 com\learnmate\config\FeeInitializer.class
+com\learnmate\notifications\factory\ExamNotificationContent.class
+com\learnmate\notifications\factory\NotificationFactory.class
 com\learnmate\service\FileStorageService$FileType.class
 com\learnmate\service\SubjectService.class
 com\learnmate\config\CustomAuthenticationSuccessHandler.class
@@ -7,6 +9,7 @@ com\learnmate\service\strategy\SearchMaterialByTitleStrategy.class
 com\learnmate\service\NotificationService.class
 com\learnmate\controller\ClassController.class
 com\learnmate\repository\AnswerSheetRepository.class
+com\learnmate\notifications\factory\NotificationContent.class
 com\learnmate\service\FeeService.class
 com\learnmate\config\UserDetailsServiceImpl.class
 com\learnmate\controller\HomeController.class
@@ -17,6 +20,7 @@ com\learnmate\model\Mark.class
 com\learnmate\controller\TeacherController.class
 com\learnmate\service\TimetableInitializer.class
 com\learnmate\service\MaterialService.class
+com\learnmate\config\CustomAuthenticationFailureHandler.class
 com\learnmate\repository\MaterialRepository.class
 com\learnmate\config\SecurityConfig.class
 com\learnmate\repository\AttendanceRepository.class
@@ -24,12 +28,14 @@ com\learnmate\repository\MarkRepository.class
 com\learnmate\controller\FeeController.class
 com\learnmate\service\FileStorageService.class
 com\learnmate\service\AnswerSheetService.class
+com\learnmate\controller\ParentReportController.class
 com\learnmate\repository\ExamRepository.class
 com\learnmate\controller\MarkController.class
 com\learnmate\service\UserService.class
 com\learnmate\service\strategy\MaterialSearchStrategy.class
 com\learnmate\service\AttendanceService.class
 com\learnmate\controller\NotificationController.class
+com\learnmate\notifications\factory\TimetableNotificationContent.class
 com\learnmate\controller\DashboardController.class
 com\learnmate\model\SchoolClass.class
 com\learnmate\controller\NotificationController$SentNotificationView.class
